@@ -6,7 +6,16 @@ const lectureSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Section',
     },
-    videoUrl: String,
+    videoUrl: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function (value) {
+                return /^https?:\/\/.+/.test(value);
+            },
+            message: "Invalid video URL",
+        },
+    },
     order: Number,
 })
 

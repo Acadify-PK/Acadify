@@ -4,6 +4,28 @@ import axios from "../api/axios";
 import ProgressBar from "../components/ProgressBar";
 import { useAuth } from "../context/AuthContext";
 
+const isYouTubeUrl = (url = "") =>
+  url.includes("youtube.com") || url.includes("youtu.be");
+
+const getYouTubeEmbedUrl = (url = "") => {
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.hostname.includes("youtu.be")) {
+      return `https://www.youtube.com/embed/${parsedUrl.pathname.slice(1)}`;
+    }
+
+    if (parsedUrl.pathname.includes("/embed/")) {
+      return url;
+    }
+
+    const videoId = parsedUrl.searchParams.get("v");
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  } catch {
+    return url;
+  }
+};
+
 function CourseDetail() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -269,15 +291,26 @@ function CourseDetail() {
         <div className="min-w-0">
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 shadow-sm">
             {canWatch && activeLecture ? (
-              <video
-                key={activeLecture._id}
-                controls
-                onEnded={enrolled ? handleAutoComplete : undefined}
-                className="aspect-video w-full bg-black"
-              >
-                <source src={activeLecture.videoUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              isYouTubeUrl(activeLecture.videoUrl) ? (
+                <iframe
+                  key={activeLecture._id}
+                  src={getYouTubeEmbedUrl(activeLecture.videoUrl)}
+                  title={activeLecture.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="aspect-video w-full bg-black"
+                />
+              ) : (
+                <video
+                  key={activeLecture._id}
+                  controls
+                  onEnded={enrolled ? handleAutoComplete : undefined}
+                  className="aspect-video w-full bg-black"
+                >
+                  <source src={activeLecture.videoUrl} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )
             ) : (
               <div className="flex aspect-video flex-col items-center justify-center px-6 text-center">
                 <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100">
@@ -432,6 +465,10 @@ function CourseDetail() {
                                 {lecture.title}
                               </span>
                               <span className="mt-1 block text-xs text-slate-400">
+                                {isYouTubeUrl(lecture.videoUrl)
+                                  ? "YouTube"
+                                  : "MP4"}{" "}
+                                ·{" "}
                                 {isCompleted
                                   ? "Completed"
                                   : canWatch

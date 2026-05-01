@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "../api/axios";
 
+const isYouTubeUrl = (url = "") =>
+  url.includes("youtube.com") || url.includes("youtu.be");
+
 const initialLectureData = {
   title: "",
   videoUrl: "",
@@ -342,11 +345,14 @@ function CourseBuilder() {
                   setError("");
                   setStatus("");
                 }}
-                placeholder="https://www.w3schools.com/html/mov_bbb.mp4"
+                placeholder="Video URL (YouTube or .mp4)"
                 required
                 disabled={sectionCount === 0}
                 className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
               />
+              <span className="mt-2 block text-xs text-slate-400">
+                Supports YouTube links and direct MP4 URLs.
+              </span>
             </label>
 
             <button
@@ -450,7 +456,10 @@ function CourseBuilder() {
                                 {lecture.title}
                               </span>
                               <span className="mt-1 block truncate text-xs text-slate-400">
-                                {lecture.videoUrl}
+                                {isYouTubeUrl(lecture.videoUrl)
+                                  ? "YouTube"
+                                  : "MP4"}{" "}
+                                · {lecture.videoUrl}
                               </span>
                             </span>
                           </li>
