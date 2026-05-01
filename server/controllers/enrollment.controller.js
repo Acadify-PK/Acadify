@@ -2,9 +2,9 @@ import Enrollment from "../models/Enrollment.js";
 
 export const enrollCourse = async (req, res) => {
     try {
-        const { userId, courseId } = req.body;
+        const userId = req.user._id;
+        const { courseId } = req.body;
 
-        // prevent duplicate enrollment
         const existing = await Enrollment.findOne({
             user: userId,
             course: courseId,
@@ -27,7 +27,8 @@ export const enrollCourse = async (req, res) => {
 
 export const checkEnrollment = async (req, res) => {
     try {
-        const { userId, courseId } = req.query;
+        const userId = req.user._id;
+        const { courseId } = req.query;
 
         const enrollment = await Enrollment.findOne({
             user: userId,

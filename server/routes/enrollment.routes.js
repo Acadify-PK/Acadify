@@ -3,10 +3,11 @@ import {
     enrollCourse,
     checkEnrollment,
 } from "../controllers/enrollment.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", enrollCourse);
-router.get("/check", checkEnrollment);
+router.post("/", protect, enrollCourse);
+router.get("/check", protect, checkEnrollment);
 
 export default router;
