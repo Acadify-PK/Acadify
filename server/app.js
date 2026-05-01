@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import courseRoutes from "./routes/course.routes.js";
 import sectionRoutes from "./routes/section.routes.js";
 import lectureRoutes from "./routes/lecture.routes.js";
+import enrollmentRoutes from "./routes/enrollment.routes.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/api/courses", courseRoutes)
 app.use("/api/sections", sectionRoutes);
 app.use("/api/lectures", lectureRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });
