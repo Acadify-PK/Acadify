@@ -12,12 +12,9 @@ function CourseDetail() {
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState(false);
 
-  const userId = "123";
-
   useEffect(() => {
     let ignore = false;
 
-    setLoading(true);
     axios
       .get(`/courses/full/${id}`)
       .then((res) => {
@@ -49,7 +46,7 @@ function CourseDetail() {
 
     axios
       .get("/enrollments/check", {
-        params: { userId, courseId: id },
+        params: { courseId: id },
       })
       .then((res) => {
         if (!ignore) setEnrolled(res.data.enrolled);
@@ -67,7 +64,6 @@ function CourseDetail() {
     try {
       setEnrolling(true);
       await axios.post("/enrollments", {
-        userId,
         courseId: id,
       });
 
