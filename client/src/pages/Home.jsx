@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Home() {
+  const { user, logout } = useAuth();
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -80,7 +83,7 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
               Course Catalog
@@ -89,6 +92,36 @@ function Home() {
               Select a course to view its curriculum and start learning.
             </p>
           </div>
+
+          {user ? (
+            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
+              <span className="max-w-40 truncate text-sm font-semibold text-slate-700">
+                {user.name}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-md bg-rose-600 px-3 py-2 text-sm font-bold text-white transition hover:bg-rose-700"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:text-cyan-700"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-md bg-cyan-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800"
+              >
+                Register
+              </Link>
+            </div>
+          )}
         </div>
 
         {loading && (

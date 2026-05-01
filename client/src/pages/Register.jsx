@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const [form, setForm] = useState({
     name: "",
@@ -24,7 +26,8 @@ function Register() {
     try {
       setSubmitting(true);
       setError("");
-      await axios.post("/auth/register", form);
+      const res = await axios.post("/auth/register", form);
+      setUser(res.data);
       navigate("/");
     } catch (err) {
       setError(
