@@ -1,5 +1,6 @@
 import Section from "../models/Section.js";
 import Lecture from "../models/Lecture.js";
+import Course from "../models/Course.js";
 
 export const createCourse = async (req, res) => {
     try {
