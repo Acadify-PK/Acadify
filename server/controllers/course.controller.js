@@ -48,19 +48,23 @@ export const getFullCourse = async (req, res) => {
     try {
         const courseId = req.params.id;
 
-        const course = await Course.findById(courseId);
+        const course = await Course.findById(courseId).select("-__v");
 
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
 
-        const sections = await Section.find({ course: courseId }).sort({ order: 1 });
+        const sections = await Section.find({ course: courseId })
+            .select("-__v")
+            .sort({ order: 1 });
 
         const sectionsWithLectures = await Promise.all(
             sections.map(async (section) => {
                 const lectures = await Lecture.find({
                     section: section._id,
-                }).sort({ order: 1 });
+                })
+                    .select("-__v")
+                    .sort({ order: 1 });
 
                 return {
                     ...section.toObject(),
