@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import ProgressBar from "../components/ProgressBar";
+import { useAuth } from "../context/AuthContext";
 
 function CourseDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
 
   const [course, setCourse] = useState(null);
   const [activeLecture, setActiveLecture] = useState(null);
@@ -182,6 +184,8 @@ function CourseDetail() {
   const progressPercent = lectureCount
     ? Math.round((completedLectures.length / lectureCount) * 100)
     : 0;
+  const isOwner = String(course?.instructor?._id || course?.instructor) === String(user?._id);
+  const canWatch = enrolled || isOwner || user?.role === "admin";
 
   if (loading) {
     return (
@@ -264,11 +268,11 @@ function CourseDetail() {
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 shadow-sm">
-            {enrolled && activeLecture ? (
+            {canWatch && activeLecture ? (
               <video
                 key={activeLecture._id}
                 controls
-                onEnded={handleAutoComplete}
+                onEnded={enrolled ? handleAutoComplete : undefined}
                 className="aspect-video w-full bg-black"
               >
                 <source src={activeLecture.videoUrl} type="video/mp4" />
@@ -277,10 +281,10 @@ function CourseDetail() {
             ) : (
               <div className="flex aspect-video flex-col items-center justify-center px-6 text-center">
                 <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100">
-                  {enrolled ? "Choose a lecture" : "Enrollment required"}
+                  {canWatch ? "Choose a lecture" : "Enrollment required"}
                 </div>
                 <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
-                  {enrolled
+                  {canWatch
                     ? "Select any lecture from the curriculum to begin."
                     : "Enroll in this course to unlock the video lessons."}
                 </p>
@@ -300,6 +304,8 @@ function CourseDetail() {
                 <p className="mt-2 text-sm text-slate-500">
                   {enrolled
                     ? `${completedLectures.length} / ${lectureCount} lectures completed`
+                    : isOwner
+                      ? "You are viewing this course as its instructor."
                     : "Enrollment unlocks lesson playback."}
                 </p>
                 {enrolled && resumeMessage && (
@@ -319,7 +325,19 @@ function CourseDetail() {
                 )}
               </div>
 
-              {!enrolled ? (
+              {isOwner ? (
+                <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                  <span className="inline-flex rounded-md bg-cyan-50 px-4 py-2 text-sm font-bold text-cyan-700">
+                    Instructor View
+                  </span>
+                  <Link
+                    to={`/instructor/course/${course._id}`}
+                    className="inline-flex items-center justify-center rounded-md bg-slate-950 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+                  >
+                    Edit Course
+                  </Link>
+                </div>
+              ) : !enrolled ? (
                 <button
                   onClick={handleEnroll}
                   disabled={enrolling}
@@ -383,9 +401,9 @@ function CourseDetail() {
                             key={lecture._id}
                             type="button"
                             onClick={() => {
-                              if (enrolled) setActiveLecture(lecture);
+                              if (canWatch) setActiveLecture(lecture);
                             }}
-                            disabled={!enrolled}
+                            disabled={!canWatch}
                             className={`flex w-full items-start gap-3 rounded-md px-3 py-3 text-left text-sm transition ${
                               isActive
                                 ? "bg-cyan-50 text-cyan-900 ring-1 ring-cyan-200"
@@ -393,7 +411,7 @@ function CourseDetail() {
                                   ? "bg-emerald-50 text-emerald-900"
                                 : "text-slate-600 hover:bg-slate-50"
                             } ${
-                              !enrolled
+                              !canWatch
                                 ? "cursor-not-allowed opacity-55"
                                 : "cursor-pointer"
                             }`}
@@ -416,7 +434,7 @@ function CourseDetail() {
                               <span className="mt-1 block text-xs text-slate-400">
                                 {isCompleted
                                   ? "Completed"
-                                  : enrolled
+                                  : canWatch
                                     ? "Ready to watch"
                                     : "Locked"}
                               </span>
