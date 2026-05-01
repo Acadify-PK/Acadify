@@ -4,13 +4,9 @@ import Course from "../models/Course.js";
 
 export const createCourse = async (req, res) => {
     try {
-        const { title, description, price } = req.body;
-
         const course = await Course.create({
-            title,
-            description,
-            price,
-            instructor: req.user?.id || null, // temporary
+            ...req.body,
+            instructor: req.user._id,
         });
 
         res.status(201).json(course);

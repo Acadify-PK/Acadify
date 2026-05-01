@@ -1,4 +1,4 @@
-import Section from "../models/Section";
+import Section from "../models/Section.js";
 
 export const createSection = async (req, res) => {
     try {

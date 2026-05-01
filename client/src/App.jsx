@@ -4,6 +4,7 @@ import CourseDetail from "./pages/CourseDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
+import InstructorDashboard from "./pages/InstructorDashboard";
 
 function App() {
   return (
@@ -20,6 +21,14 @@ function App() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/instructor"
+        element={
+          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+            <InstructorDashboard />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

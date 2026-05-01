@@ -95,6 +95,14 @@ function Home() {
 
           {user ? (
             <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
+              {(user.role === "instructor" || user.role === "admin") && (
+                <Link
+                  to="/instructor"
+                  className="rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2 text-sm font-bold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
+                >
+                  Dashboard
+                </Link>
+              )}
               <span className="max-w-40 truncate text-sm font-semibold text-slate-700">
                 {user.name}
               </span>

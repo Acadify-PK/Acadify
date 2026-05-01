@@ -7,10 +7,6 @@ const generateToken = (userId) => {
     });
 };
 
-export const me = (req, res) => {
-    res.json(req.user);
-}
-
 export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -33,6 +29,7 @@ export const register = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
             });
 
     } catch (error) {
@@ -59,11 +56,21 @@ export const login = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
             });
 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+export const me = (req, res) => {
+    res.json({
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+    });
 };
 
 export const logout = (req, res) => {
