@@ -5,6 +5,10 @@ const progressSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
+    course: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+    },
 
     lecture: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,8 +17,8 @@ const progressSchema = new mongoose.Schema({
 
     completed: {
         type: Boolean,
-        default: false,
+        default: true,
     },
-});
+}, { timestamps: true });
 
 export default mongoose.model("Progress", progressSchema);

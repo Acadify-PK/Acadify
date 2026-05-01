@@ -11,6 +11,8 @@ function CourseDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState(false);
+  const [completedLectures, setCompletedLectures] = useState([]);
+  const [savingProgress, setSavingProgress] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -35,6 +37,25 @@ function CourseDetail() {
       .finally(() => {
         if (!ignore) setLoading(false);
       });
+
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    axios
+      .get(`/progress/${id}`)
+      .then((res) => {
+        if (!ignore) {
+          setCompletedLectures(
+            res.data.map((progress) => String(progress.lecture)),
+          );
+        }
+      })
+      .catch((err) => console.error(err));
 
     return () => {
       ignore = true;
@@ -75,6 +96,29 @@ function CourseDetail() {
     }
   };
 
+  const handleComplete = async () => {
+    if (!activeLecture || completedLectures.includes(activeLecture._id)) return;
+
+    try {
+      setSavingProgress(true);
+
+      await axios.post("/progress", {
+        courseId: id,
+        lectureId: activeLecture._id,
+      });
+
+      setCompletedLectures((current) =>
+        current.includes(activeLecture._id)
+          ? current
+          : [...current, activeLecture._id],
+      );
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    } finally {
+      setSavingProgress(false);
+    }
+  };
+
   const lectureCount = useMemo(
     () =>
       (course?.sections || []).reduce(
@@ -83,6 +127,10 @@ function CourseDetail() {
       ),
     [course],
   );
+
+  const progressPercent = lectureCount
+    ? Math.round((completedLectures.length / lectureCount) * 100)
+    : 0;
 
   if (loading) {
     return (
@@ -140,6 +188,12 @@ function CourseDetail() {
 
             <div className="flex flex-wrap gap-3">
               <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-xl font-bold">{progressPercent}%</p>
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                  Progress
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
                 <p className="text-xl font-bold">{course.sections?.length || 0}</p>
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
                   Sections
@@ -163,6 +217,7 @@ function CourseDetail() {
               <video
                 key={activeLecture._id}
                 controls
+                onEnded={handleComplete}
                 className="aspect-video w-full bg-black"
               >
                 <source src={activeLecture.videoUrl} type="video/mp4" />
@@ -193,9 +248,17 @@ function CourseDetail() {
                 </h2>
                 <p className="mt-2 text-sm text-slate-500">
                   {enrolled
-                    ? "Use the curriculum panel to switch lessons."
+                    ? `Progress: ${progressPercent}% complete`
                     : "Enrollment unlocks lesson playback."}
                 </p>
+                {enrolled && lectureCount > 0 && (
+                  <div className="mt-4 h-2 max-w-md overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-cyan-700 transition-all"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                )}
               </div>
 
               {!enrolled ? (
@@ -207,9 +270,27 @@ function CourseDetail() {
                   {enrolling ? "Enrolling..." : "Enroll Now"}
                 </button>
               ) : (
-                <span className="inline-flex shrink-0 rounded-md bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700">
-                  Enrolled
-                </span>
+                <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                  <span className="inline-flex rounded-md bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700">
+                    Enrolled
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleComplete}
+                    disabled={
+                      !activeLecture ||
+                      savingProgress ||
+                      completedLectures.includes(activeLecture._id)
+                    }
+                    className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {completedLectures.includes(activeLecture?._id)
+                      ? "Completed"
+                      : savingProgress
+                        ? "Saving..."
+                        : "Mark as Completed"}
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -221,6 +302,12 @@ function CourseDetail() {
             <p className="mt-1 text-sm text-slate-500">
               {lectureCount} lectures across {course.sections?.length || 0} sections
             </p>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-cyan-700 transition-all"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
 
           <div className="max-h-[calc(100vh-180px)] overflow-y-auto p-3">
@@ -240,6 +327,9 @@ function CourseDetail() {
                     {section.lectures?.length ? (
                       section.lectures.map((lecture, lectureIndex) => {
                         const isActive = activeLecture?._id === lecture._id;
+                        const isCompleted = completedLectures.includes(
+                          lecture._id,
+                        );
 
                         return (
                           <button
@@ -252,6 +342,8 @@ function CourseDetail() {
                             className={`flex w-full items-start gap-3 rounded-md px-3 py-3 text-left text-sm transition ${
                               isActive
                                 ? "bg-cyan-50 text-cyan-900 ring-1 ring-cyan-200"
+                                : isCompleted
+                                  ? "bg-emerald-50 text-emerald-900"
                                 : "text-slate-600 hover:bg-slate-50"
                             } ${
                               !enrolled
@@ -263,17 +355,23 @@ function CourseDetail() {
                               className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                                 isActive
                                   ? "bg-cyan-700 text-white"
+                                  : isCompleted
+                                    ? "bg-emerald-600 text-white"
                                   : "bg-slate-100 text-slate-500"
                               }`}
                             >
-                              {lectureIndex + 1}
+                              {isCompleted ? "OK" : lectureIndex + 1}
                             </span>
                             <span className="min-w-0">
                               <span className="block font-semibold">
                                 {lecture.title}
                               </span>
                               <span className="mt-1 block text-xs text-slate-400">
-                                {enrolled ? "Ready to watch" : "Locked"}
+                                {isCompleted
+                                  ? "Completed"
+                                  : enrolled
+                                    ? "Ready to watch"
+                                    : "Locked"}
                               </span>
                             </span>
                           </button>
