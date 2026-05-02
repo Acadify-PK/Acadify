@@ -366,12 +366,20 @@ function CourseDetail() {
     <main className="min-h-screen bg-[#f7f8fb] text-slate-950">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
-          <Link
-            to="/"
-            className="inline-flex items-center text-sm font-semibold text-cyan-700 hover:text-cyan-800"
-          >
-            Back to courses
-          </Link>
+          <div className="flex gap-4">
+            <Link
+              to="/"
+              className="inline-flex items-center text-sm font-semibold text-cyan-700 hover:text-cyan-800"
+            >
+              Marketplace
+            </Link>
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-slate-700"
+            >
+              My Learning
+            </Link>
+          </div>
 
           <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">

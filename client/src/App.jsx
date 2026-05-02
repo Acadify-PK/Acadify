@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import CourseBuilder from "./pages/CourseBuilder";
+import StudentDashboard from "./pages/StudentDashboard";
 
 function App() {
   return (
@@ -22,6 +23,14 @@ function App() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/instructor"
         element={
