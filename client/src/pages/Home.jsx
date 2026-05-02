@@ -7,17 +7,24 @@ function Home() {
   const { user, logout } = useAuth();
 
   const [courses, setCourses] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
+  const [totalCourses, setTotalCourses] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let ignore = false;
+    setLoading(true);
 
     axios
-      .get("/courses")
+      .get(`/courses?page=${page}&limit=8&search=${encodeURIComponent(search)}`)
       .then((res) => {
         if (!ignore) {
-          setCourses(res.data);
+          setCourses(res.data.data || []);
+          setTotalPages(res.data.totalPages || 1);
+          setTotalCourses(res.data.total || 0);
           setError("");
         }
       })
@@ -31,7 +38,7 @@ function Home() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [page, search]);
 
   const totalLessons = useMemo(
     () =>
@@ -46,6 +53,11 @@ function Home() {
         0,
       ),
     [courses],
+  );
+
+  const pageNumbers = useMemo(
+    () => Array.from({ length: totalPages }, (_, index) => index + 1),
+    [totalPages],
   );
 
   return (
@@ -68,7 +80,7 @@ function Home() {
           <div className="grid grid-cols-2 gap-3 sm:min-w-80">
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
               <p className="text-3xl font-bold text-slate-950">
-                {courses.length}
+                {totalCourses}
               </p>
               <p className="mt-1 text-sm text-slate-500">Courses</p>
             </div>
@@ -132,6 +144,22 @@ function Home() {
           )}
         </div>
 
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <label className="block">
+            <span className="text-sm font-semibold text-slate-700">Search courses</span>
+            <input
+              type="search"
+              placeholder="Search courses by title, description, or category..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
+            />
+          </label>
+        </div>
+
         {loading && (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((item) => (
@@ -161,38 +189,82 @@ function Home() {
         )}
 
         {!loading && !error && courses.length > 0 && (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {courses.map((course, index) => (
-              <Link
-                key={course._id}
-                to={`/courses/${course._id}`}
-                className="group flex min-h-52 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-              >
-                <div className="mb-5 flex items-center justify-between gap-3">
-                  <span className="rounded-md bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
-                    Course {index + 1}
-                  </span>
-                  <span className="text-sm font-medium text-slate-400 transition group-hover:text-cyan-700">
-                    Open
-                  </span>
-                </div>
+          <>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {courses.map((course, index) => (
+                <Link
+                  key={course._id}
+                  to={`/courses/${course._id}`}
+                  className="group flex min-h-52 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+                >
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <span className="rounded-md bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                      Course {(page - 1) * 8 + index + 1}
+                    </span>
+                    <span className="text-sm font-medium text-slate-400 transition group-hover:text-cyan-700">
+                      Open
+                    </span>
+                  </div>
 
-                <h3 className="text-xl font-bold leading-snug text-slate-950">
-                  {course.title}
-                </h3>
-                <p className="mt-3 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
-                  {course.description || "Course details will be added soon."}
-                </p>
+                  <h3 className="text-xl font-bold leading-snug text-slate-950">
+                    {course.title}
+                  </h3>
+                  <p className="mt-3 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
+                    {course.description || "Course details will be added soon."}
+                  </p>
 
-                <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-sm text-slate-500">
-                  <span>{course.sections?.length || 0} sections</span>
-                  <span className="font-semibold text-slate-700">
-                    View curriculum
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-sm text-slate-500">
+                    <span>{course.sections?.length || 0} sections</span>
+                    <span className="font-semibold text-slate-700">
+                      View curriculum
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:flex-row">
+              <div className="text-sm text-slate-500">
+                Page <span className="font-semibold text-slate-900">{page}</span> of{" "}
+                <span className="font-semibold text-slate-900">{totalPages}</span>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Prev
+                </button>
+
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    type="button"
+                    onClick={() => setPage(number)}
+                    className={`rounded-md border px-4 py-2 text-sm font-semibold transition ${
+                      number === page
+                        ? "border-cyan-600 bg-cyan-600 text-white shadow-sm"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-cyan-300 hover:text-cyan-700"
+                    }`}
+                  >
+                    {number}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                  className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </section>
     </main>

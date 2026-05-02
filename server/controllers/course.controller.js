@@ -17,8 +17,31 @@ export const createCourse = async (req, res) => {
 
 export const getAllCourses = async (req, res) => {
     try {
-        const courses = await Course.find({ published: true }).populate("instructor", "name email");
-        res.json(courses);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = (req.query.search || "").trim();
+
+        const skip = (page - 1) * limit;
+
+        const query = {
+            published: true,
+            ...(search ? { $text: { $search: search } } : {}),
+        };
+
+        const total = await Course.countDocuments(query);
+
+        const courses = await Course.find(query)
+            .populate("instructor", "name email")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.json({
+            data: courses,
+            page,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
+            total,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
