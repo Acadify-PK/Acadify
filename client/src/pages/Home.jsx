@@ -128,6 +128,14 @@ function Home() {
                   Dashboard
                 </Link>
               )}
+              {(user.role === "instructor" || user.role === "admin") && (
+                <Link
+                  to="/instructor/analytics"
+                  className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-700 transition hover:border-amber-300 hover:bg-amber-100"
+                >
+                  Analytics
+                </Link>
+              )}
               <span className="max-w-40 truncate text-sm font-semibold text-slate-700">
                 {user.name}
               </span>

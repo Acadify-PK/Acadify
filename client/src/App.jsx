@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import CourseBuilder from "./pages/CourseBuilder";
 import StudentDashboard from "./pages/StudentDashboard";
+import InstructorAnalytics from "./pages/InstructorAnalytics";
 
 function App() {
   return (
@@ -36,6 +37,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["instructor", "admin"]}>
             <InstructorDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/instructor/analytics"
+        element={
+          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+            <InstructorAnalytics />
           </ProtectedRoute>
         }
       />
