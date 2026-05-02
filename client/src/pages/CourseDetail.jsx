@@ -26,6 +26,22 @@ const getYouTubeEmbedUrl = (url = "") => {
   }
 };
 
+const getRatingLabel = (rating) => {
+  if (rating >= 4.5) return "Outstanding";
+  if (rating >= 3.5) return "Strong";
+  if (rating >= 2.5) return "Solid";
+  if (rating >= 1.5) return "Mixed";
+
+  return "Needs work";
+};
+
+const formatReviewDate = (value) =>
+  new Date(value).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
 function CourseDetail() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -39,11 +55,37 @@ function CourseDetail() {
   const [completedLectures, setCompletedLectures] = useState([]);
   const [savingProgress, setSavingProgress] = useState(false);
   const [resumeMessage, setResumeMessage] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: "",
+  });
 
   const allLectures = useMemo(
     () => (course?.sections || []).flatMap((section) => section.lectures || []),
     [course],
   );
+
+  const currentUserReview = useMemo(
+    () =>
+      reviews.find(
+        (review) => String(review.user?._id || review.user) === String(user?._id),
+      ) || null,
+    [reviews, user?._id],
+  );
+
+  const reviewCount = reviews.length;
+  const averageRating = reviewCount
+    ? reviews.reduce((total, review) => total + Number(review.rating || 0), 0) /
+      reviewCount
+    : 0;
+  const ratingBreakdown = [5, 4, 3, 2, 1].map((rating) => ({
+    rating,
+    count: reviews.filter((review) => Number(review.rating) === rating).length,
+  }));
 
   useEffect(() => {
     let ignore = false;
@@ -67,6 +109,35 @@ function CourseDetail() {
       })
       .finally(() => {
         if (!ignore) setLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    setReviewsLoading(true);
+
+    axios
+      .get(`/reviews/${id}`)
+      .then((res) => {
+        if (ignore) return;
+
+        const nextReviews = [...res.data].sort(
+          (left, right) => new Date(right.createdAt) - new Date(left.createdAt),
+        );
+
+        setReviews(nextReviews);
+        setReviewsError("");
+      })
+      .catch(() => {
+        if (!ignore) setReviewsError("Reviews could not be loaded right now.");
+      })
+      .finally(() => {
+        if (!ignore) setReviewsLoading(false);
       });
 
     return () => {
@@ -194,6 +265,57 @@ function CourseDetail() {
     if (saved) playNextLecture();
   };
 
+  const handleReviewChange = (event) => {
+    const { name, value } = event.target;
+
+    setReviewForm((current) => ({
+      ...current,
+      [name]: name === "rating" ? Number(value) : value,
+    }));
+  };
+
+  const handleReviewSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!user || !enrolled || isOwner || currentUserReview) {
+      return;
+    }
+
+    const trimmedComment = reviewForm.comment.trim();
+
+    if (!trimmedComment) {
+      return;
+    }
+
+    try {
+      setReviewSubmitting(true);
+
+      const res = await axios.post("/reviews", {
+        courseId: id,
+        rating: reviewForm.rating,
+        comment: trimmedComment,
+      });
+
+      setReviews((current) =>
+        [
+          {
+            ...res.data,
+            user: {
+              _id: user._id,
+              name: user.name,
+            },
+          },
+          ...current,
+        ].sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt)),
+      );
+      setReviewForm({ rating: 5, comment: "" });
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
   const lectureCount = useMemo(
     () =>
       (course?.sections || []).reduce(
@@ -208,6 +330,7 @@ function CourseDetail() {
     : 0;
   const isOwner = String(course?.instructor?._id || course?.instructor) === String(user?._id);
   const canWatch = enrolled || isOwner || user?.role === "admin";
+  const canReview = Boolean(user && enrolled && !isOwner);
 
   if (loading) {
     return (
@@ -215,8 +338,8 @@ function CourseDetail() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-5 h-6 w-32 animate-pulse rounded bg-slate-200" />
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="h-[420px] animate-pulse rounded-lg bg-white" />
-            <div className="h-[420px] animate-pulse rounded-lg bg-white" />
+            <div className="h-105 animate-pulse rounded-lg bg-white" />
+            <div className="h-105 animate-pulse rounded-lg bg-white" />
           </div>
         </div>
       </main>
@@ -494,6 +617,254 @@ function CourseDetail() {
             )}
           </div>
         </aside>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-10 sm:px-8">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 p-5 sm:p-6">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                  Reviews
+                </p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+                  Learner feedback for this course.
+                </h2>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
+                  Read recent reviews, or leave feedback after enrolling in the course.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-w-105">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-2xl font-bold text-slate-950">
+                    {reviewCount ? averageRating.toFixed(1) : "--"}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Average
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-2xl font-bold text-slate-950">{reviewCount}</p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Reviews
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-2xl font-bold text-slate-950">
+                    {reviews.filter((review) => Number(review.rating) >= 4).length}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    4+ Stars
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-2xl font-bold text-slate-950">
+                    {reviewsLoading ? "..." : ratingBreakdown[0]?.count || 0}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Top Ratings
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-0 lg:grid-cols-[360px_minmax(0,1fr)]">
+            <div className="border-b border-slate-200 p-5 lg:border-b-0 lg:border-r lg:p-6">
+              <div className="rounded-2xl bg-slate-50 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                      Leave a review
+                    </p>
+                    <h3 className="mt-2 text-xl font-bold text-slate-950">
+                      {currentUserReview ? "Your review" : "Share your experience"}
+                    </h3>
+                  </div>
+                  <div className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-700 shadow-sm">
+                    {getRatingLabel(reviewForm.rating)}
+                  </div>
+                </div>
+
+                {!user ? (
+                  <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                    Sign in to leave feedback for this course.
+                  </div>
+                ) : !canReview ? (
+                  <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                    Enroll in the course to unlock the review form.
+                  </div>
+                ) : currentUserReview ? (
+                  <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                      Submitted
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-emerald-900">
+                      {currentUserReview.rating}/5 - {getRatingLabel(currentUserReview.rating)}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-900/80">
+                      {currentUserReview.comment || "No comment was added."}
+                    </p>
+                    <p className="mt-3 text-xs font-medium text-emerald-800/80">
+                      Reviews are limited to one submission per learner right now.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4">
+                    <fieldset>
+                      <legend className="text-sm font-semibold text-slate-700">
+                        Rating
+                      </legend>
+                      <div className="mt-2 grid grid-cols-5 gap-2">
+                        {[1, 2, 3, 4, 5].map((rating) => {
+                          const selected = reviewForm.rating === rating;
+
+                          return (
+                            <button
+                              key={rating}
+                              type="button"
+                              onClick={() =>
+                                setReviewForm((current) => ({
+                                  ...current,
+                                  rating,
+                                }))
+                              }
+                              className={`rounded-lg border px-3 py-3 text-sm font-bold transition ${
+                                selected
+                                  ? "border-cyan-600 bg-cyan-600 text-white shadow-sm"
+                                  : "border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:text-cyan-700"
+                              }`}
+                            >
+                              {rating}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
+
+                    <label className="block">
+                      <span className="text-sm font-semibold text-slate-700">
+                        Comment
+                      </span>
+                      <textarea
+                        name="comment"
+                        value={reviewForm.comment}
+                        onChange={handleReviewChange}
+                        rows={5}
+                        placeholder="What stood out, and what could be improved?"
+                        className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                      />
+                    </label>
+
+                    <button
+                      type="submit"
+                      disabled={reviewSubmitting || !reviewForm.comment.trim()}
+                      className="inline-flex w-full items-center justify-center rounded-xl bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {reviewSubmitting ? "Publishing..." : "Publish review"}
+                    </button>
+                  </form>
+                )}
+              </div>
+
+              <div className="mt-5 space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Rating breakdown
+                  </h3>
+                  <span className="text-sm font-semibold text-slate-500">
+                    {reviewCount} total
+                  </span>
+                </div>
+
+                {ratingBreakdown.map((item) => {
+                  const percent = reviewCount ? (item.count / reviewCount) * 100 : 0;
+
+                  return (
+                    <div key={item.rating} className="flex items-center gap-3 text-sm">
+                      <span className="w-10 shrink-0 font-semibold text-slate-700">
+                        {item.rating}
+                      </span>
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className="h-full rounded-full bg-cyan-600 transition-all duration-500"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                      <span className="w-8 shrink-0 text-right font-semibold text-slate-500">
+                        {item.count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-950">Recent reviews</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {reviewsLoading
+                      ? "Loading reviews..."
+                      : reviewCount
+                        ? "Most recent feedback appears first."
+                        : "No one has reviewed this course yet."}
+                  </p>
+                </div>
+                {reviewsError && (
+                  <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+                    {reviewsError}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-5 space-y-4">
+                {reviewsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((item) => (
+                      <div
+                        key={item}
+                        className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-slate-50"
+                      />
+                    ))}
+                  </div>
+                ) : reviewCount > 0 ? (
+                  reviews.map((review) => (
+                    <article
+                      key={review._id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-base font-bold text-slate-950">
+                            {review.user?.name || "Learner"}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                            {formatReviewDate(review.createdAt)}
+                          </p>
+                        </div>
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-bold text-cyan-700 shadow-sm">
+                          <span>{review.rating}/5</span>
+                          <span className="text-slate-300">|</span>
+                          <span>{getRatingLabel(review.rating)}</span>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-sm leading-7 text-slate-600">
+                        {review.comment || "No written comment was added."}
+                      </p>
+                    </article>
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-sm leading-6 text-slate-500">
+                    This course has no reviews yet. Once learners start sharing feedback, it will show up here.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );

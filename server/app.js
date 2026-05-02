@@ -9,6 +9,7 @@ import lectureRoutes from "./routes/lecture.routes.js";
 import enrollmentRoutes from "./routes/enrollment.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/lectures", lectureRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });
