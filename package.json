@@ -4,13 +4,13 @@
   "version": "1.0.0",
   "description": "LMS platform with course management, lectures, and student progress tracking",
   "scripts": {
-    "dev": "concurrently --names \"SERVER,CLIENT\" --prefix \"[{name}]\" --prefix-colors \"blue,cyan\" \"bun --cwd server run dev\" \"bun --cwd client run dev\"",
-    "dev:server": "bun --cwd server run dev",
-    "dev:client": "bun --cwd client run dev",
-    "build": "bun --cwd server run build && bun --cwd client run build",
-    "build:server": "bun --cwd server run build",
-    "build:client": "bun --cwd client run build",
-    "install:all": "bun install && bun --cwd client install && bun --cwd server install"
+    "dev": "concurrently --names \"SERVER,CLIENT\" --prefix \"[{name}]\" --prefix-colors \"blue,cyan\" \"cd server && bun run dev\" \"cd client && bun run dev\"",
+    "dev:server": "cd server && bun run dev",
+    "dev:client": "cd client && bun run dev",
+    "build": "cd server && bun run build && cd ../client && bun run build",
+    "build:server": "cd server && bun run build",
+    "build:client": "cd client && bun run build",
+    "install:all": "bun install && cd client && bun install && cd ../server && bun install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
