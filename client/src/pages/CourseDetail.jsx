@@ -331,6 +331,7 @@ function CourseDetail() {
   const isOwner = String(course?.instructor?._id || course?.instructor) === String(user?._id);
   const canWatch = enrolled || isOwner || user?.role === "admin";
   const canReview = Boolean(user && enrolled && !isOwner);
+  const certificateUrl = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"}/certificates/${id}`;
 
   if (loading) {
     return (
@@ -486,6 +487,15 @@ function CourseDetail() {
                   <p className="mt-3 text-sm font-bold text-emerald-700">
                     Course completed.
                   </p>
+                )}
+                {enrolled && progressPercent === 100 && (
+                  <button
+                    type="button"
+                    onClick={() => window.open(certificateUrl, "_blank", "noopener,noreferrer")}
+                    className="mt-4 inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700"
+                  >
+                    Download Certificate
+                  </button>
                 )}
               </div>
 
