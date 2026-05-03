@@ -21,4 +21,6 @@ const progressSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
+progressSchema.index({ user: 1, lecture: 1 }, { unique: true });
+
 export default mongoose.model("Progress", progressSchema);

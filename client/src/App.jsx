@@ -8,6 +8,7 @@ import InstructorDashboard from "./pages/InstructorDashboard";
 import CourseBuilder from "./pages/CourseBuilder";
 import StudentDashboard from "./pages/StudentDashboard";
 import InstructorAnalytics from "./pages/InstructorAnalytics";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       />
 
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/register" element={<Register />} />
       <Route
         path="/dashboard"

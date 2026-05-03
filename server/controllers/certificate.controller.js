@@ -9,6 +9,10 @@ export const generateCertificate = async (req, res) => {
         const user = req.user;
         const { courseId } = req.params;
 
+        if (!user) {
+            return res.status(401).json({ message: "Not authorized" });
+        }
+
         const course = await Course.findById(courseId).select("title");
 
         if (!course) {
@@ -22,12 +26,13 @@ export const generateCertificate = async (req, res) => {
             section: { $in: sectionIds },
         });
 
-        const completed = await Progress.countDocuments({
+        const completedLectureIds = await Progress.distinct("lecture", {
             user: user._id,
             course: courseId,
+            completed: true,
         });
 
-        if (completed < totalLectures || totalLectures === 0) {
+        if (completedLectureIds.length < totalLectures || totalLectures === 0) {
             return res.status(403).json({
                 message: "Complete the course to get certificate",
             });
@@ -134,6 +139,7 @@ export const generateCertificate = async (req, res) => {
 
         doc.end();
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };

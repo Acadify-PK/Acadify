@@ -331,6 +331,7 @@ function CourseDetail() {
   const isOwner = String(course?.instructor?._id || course?.instructor) === String(user?._id);
   const canWatch = enrolled || isOwner || user?.role === "admin";
   const canReview = Boolean(user && enrolled && !isOwner);
+  const isCourseComplete = lectureCount > 0 && completedLectures.length === lectureCount;
   const certificateUrl = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api"}/certificates/${id}`;
 
   if (loading) {
@@ -483,12 +484,12 @@ function CourseDetail() {
                     <ProgressBar value={progressPercent} />
                   </div>
                 )}
-                {enrolled && progressPercent === 100 && (
+                {enrolled && isCourseComplete && (
                   <p className="mt-3 text-sm font-bold text-emerald-700">
                     Course completed.
                   </p>
                 )}
-                {enrolled && progressPercent === 100 && (
+                {enrolled && isCourseComplete && (
                   <button
                     type="button"
                     onClick={() => window.open(certificateUrl, "_blank", "noopener,noreferrer")}

@@ -88,15 +88,21 @@ function Login() {
             <p className="mt-2 text-slate-500">Enter your credentials to access your account</p>
 
             {error && (
-              <div className="mt-8 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-700">
+              <div
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                className="mt-8 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-700"
+              >
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="mt-10 space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-500">Email Address</label>
+                <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-slate-500">Email Address</label>
                 <input
+                  id="email"
                   type="email"
                   name="email"
                   required
@@ -109,10 +115,11 @@ function Login() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-500">Password</label>
-                  <a href="#" className="text-xs font-bold text-cyan-600 hover:text-cyan-700">Forgot?</a>
+                  <label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-slate-500">Password</label>
+                  <Link to="/forgot-password" className="text-xs font-bold text-cyan-600 hover:text-cyan-700">Forgot?</Link>
                 </div>
                 <input
+                  id="password"
                   type="password"
                   name="password"
                   required

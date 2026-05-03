@@ -5,18 +5,25 @@ export const markComplete = async (req, res) => {
         const userId = req.user._id;
         const { courseId, lectureId } = req.body;
 
-        const existing = await Progress.findOne({
-            user: userId,
-            lecture: lectureId,
-        });
-
-        if (existing) return res.json(existing);
-
-        const progress = await Progress.create({
-            user: userId,
-            course: courseId,
-            lecture: lectureId,
-        });
+        const progress = await Progress.findOneAndUpdate(
+            {
+                user: userId,
+                lecture: lectureId,
+            },
+            {
+                $setOnInsert: {
+                    user: userId,
+                    course: courseId,
+                    lecture: lectureId,
+                    completed: true,
+                },
+            },
+            {
+                new: true,
+                upsert: true,
+                setDefaultsOnInsert: true,
+            }
+        );
 
         res.status(201).json(progress);
     } catch (error) {
