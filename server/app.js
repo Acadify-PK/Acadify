@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import certificateRoutes from "./routes/certificate.routes.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/certificates", certificateRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });
