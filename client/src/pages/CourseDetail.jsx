@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import ProgressBar from "../components/ProgressBar";
 import { useAuth } from "../context/AuthContext";
+import Comments from "../components/Comments";
 
 const isYouTubeUrl = (url = "") =>
   url.includes("youtube.com") || url.includes("youtu.be");
@@ -637,7 +638,6 @@ function CourseDetail() {
           </div>
         </aside>
       </section>
-
       <section className="mx-auto max-w-7xl px-5 pb-10 sm:px-8">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-5 sm:p-6">
@@ -885,6 +885,8 @@ function CourseDetail() {
           </div>
         </div>
       </section>
+
+      <Comments courseId={id} enrolled={enrolled} course={course} />
     </main>
   );
 }

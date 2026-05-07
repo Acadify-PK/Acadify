@@ -1,0 +1,146 @@
+import Comment from "../models/Comment.js";
+import Course from "../models/Course.js";
+import ModerationLog from "../models/ModerationLog.js";
+
+export const addComment = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { courseId, content } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+
+    const comment = await Comment.create({
+      user: userId,
+      course: courseId,
+      content: content.trim(),
+    });
+
+    const populated = await comment.populate("user", "name");
+
+    res.status(201).json(populated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getComments = async (req, res) => {
+  try {
+    const comments = await Comment.find({ course: req.params.courseId })
+      .sort({ createdAt: -1 })
+      .populate("user", "name");
+
+    res.json(comments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteComment = async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
+
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // allow deletion by owner or admin
+    // owner
+    if (String(comment.user) === String(req.user._id)) {
+      const prev = { hidden: comment.hidden, content: comment.content };
+      await comment.remove();
+      await ModerationLog.create({
+        action: 'delete',
+        comment: comment._id,
+        course: comment.course,
+        moderator: req.user._id,
+        moderatorRole: req.user.role,
+        reason: req.body.reason || 'Deleted by owner',
+        previousState: prev,
+      });
+      return res.json({ message: "Comment deleted" });
+    }
+
+    // admin can delete
+    if (req.user.role === "admin") {
+      const prev = { hidden: comment.hidden, content: comment.content };
+      await comment.remove();
+      await ModerationLog.create({
+        action: 'delete',
+        comment: comment._id,
+        course: comment.course,
+        moderator: req.user._id,
+        moderatorRole: req.user.role,
+        reason: req.body.reason || 'Deleted by admin',
+        previousState: prev,
+      });
+      return res.json({ message: "Comment deleted" });
+    }
+
+    // instructor of the course can delete
+    const course = await Course.findById(comment.course).select("instructor");
+    if (course && String(course.instructor) === String(req.user._id)) {
+      await comment.remove();
+      // log deletion by instructor
+      await ModerationLog.create({
+        action: 'delete',
+        comment: comment._id,
+        course: comment.course,
+        moderator: req.user._id,
+        moderatorRole: req.user.role,
+        reason: req.body.reason || '',
+        previousState: { hidden: comment.hidden, content: comment.content },
+      });
+      return res.json({ message: "Comment deleted" });
+    }
+
+    return res.status(403).json({ message: "Not authorized to delete this comment" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const moderateComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { hidden, reason } = req.body;
+
+    const comment = await Comment.findById(id);
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    // only admin or course instructor can moderate
+    if (req.user.role === "admin") {
+      // ok
+    } else {
+      const course = await Course.findById(comment.course).select("instructor");
+      if (!course || String(course.instructor) !== String(req.user._id)) {
+        return res.status(403).json({ message: "Not authorized to moderate this comment" });
+      }
+    }
+
+    const previousHidden = comment.hidden;
+    comment.hidden = Boolean(hidden);
+    comment.moderationReason = reason || "";
+    comment.moderatedBy = req.user._id;
+    comment.moderatedAt = new Date();
+
+    await comment.save();
+
+    const populated = await comment.populate("user", "name").populate("moderatedBy", "name");
+
+    // create audit log
+    await ModerationLog.create({
+      action: comment.hidden ? 'hide' : 'unhide',
+      comment: comment._id,
+      course: comment.course,
+      moderator: req.user._id,
+      moderatorRole: req.user.role,
+      reason: reason || '',
+      previousState: { hidden: previousHidden },
+      newState: { hidden: comment.hidden },
+    });
+
+    res.json(populated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

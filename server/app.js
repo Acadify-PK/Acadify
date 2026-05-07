@@ -12,6 +12,8 @@ import progressRoutes from "./routes/progress.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import certificateRoutes from "./routes/certificate.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
+import moderationRoutes from "./routes/moderation.routes.js";
 
 const app = express();
 
@@ -33,6 +35,8 @@ app.use("/api/progress", progressRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/moderation", moderationRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });
