@@ -11,9 +11,11 @@ export default function AdminModerationLogs() {
   const [error, setError] = useState('');
 
   const [courseId, setCourseId] = useState('');
+  const [courseIdTerm, setCourseIdTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   const [page, setPage] = useState(1);
   const pageSize = 20;
@@ -48,9 +50,21 @@ export default function AdminModerationLogs() {
 
   // debounce searchTerm -> query (500ms)
   useEffect(() => {
-    const t = setTimeout(() => setQuery(searchTerm), 500);
+    const t = setTimeout(() => {
+      setQuery(searchTerm);
+      setIsSearching(false);
+    }, 500);
     return () => clearTimeout(t);
   }, [searchTerm]);
+
+  // debounce courseIdTerm -> courseId (500ms)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setCourseId(courseIdTerm);
+      setIsSearching(false);
+    }, 500);
+    return () => clearTimeout(t);
+  }, [courseIdTerm]);
 
   const exportCSV = () => {
     const rows = [
@@ -90,18 +104,18 @@ export default function AdminModerationLogs() {
         </div>
 
         <div className="mb-4 grid gap-3 sm:grid-cols-4">
-          <input value={courseId} onChange={(e) => setCourseId(e.target.value)} placeholder="Filter by courseId" className="rounded-md border px-3 py-2" />
+          <input value={courseIdTerm} onChange={(e) => { setCourseIdTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Filter by courseId" className="rounded-md border px-3 py-2" />
           <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} className="rounded-md border px-3 py-2">
             <option value="all">All actions</option>
             <option value="hide">Hide</option>
             <option value="unhide">Unhide</option>
             <option value="delete">Delete</option>
           </select>
-          <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} placeholder="Search moderator/comment/reason" className="rounded-md border px-3 py-2 col-span-2" />
+          <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Search moderator/comment/reason" className="rounded-md border px-3 py-2 col-span-2" />
         </div>
 
         <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm text-slate-600">{loading ? 'Loading...' : `${total} logs found`}</div>
+          <div className="text-sm text-slate-600">{loading ? 'Loading...' : isSearching ? 'Searching...' : `${total} logs found`}</div>
           <div className="flex items-center gap-3">
             <button onClick={exportCSV} className="rounded-md bg-cyan-700 px-3 py-2 text-sm font-semibold text-white">Export CSV</button>
           </div>
