@@ -13,6 +13,7 @@ export default function AdminModerationLogs() {
   const [courseId, setCourseId] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [query, setQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [page, setPage] = useState(1);
   const pageSize = 20;
@@ -44,6 +45,12 @@ export default function AdminModerationLogs() {
 
     return () => { ignore = true; };
   }, [courseId, actionFilter, query, page]);
+
+  // debounce searchTerm -> query (500ms)
+  useEffect(() => {
+    const t = setTimeout(() => setQuery(searchTerm), 500);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const exportCSV = () => {
     const rows = [
@@ -90,7 +97,7 @@ export default function AdminModerationLogs() {
             <option value="unhide">Unhide</option>
             <option value="delete">Delete</option>
           </select>
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search moderator/comment/reason" className="rounded-md border px-3 py-2 col-span-2" />
+          <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }} placeholder="Search moderator/comment/reason" className="rounded-md border px-3 py-2 col-span-2" />
         </div>
 
         <div className="mb-4 flex items-center justify-between">

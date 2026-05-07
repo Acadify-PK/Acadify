@@ -14,6 +14,7 @@ export default function Comments({ courseId, enrolled, course }) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     let ignore = false;
@@ -45,6 +46,15 @@ export default function Comments({ courseId, enrolled, course }) {
       ignore = true;
     };
   }, [courseId, page, query]);
+
+  // debounce searchTerm -> query
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setQuery(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   useEffect(() => {
     setPage(1);
@@ -118,9 +128,9 @@ export default function Comments({ courseId, enrolled, course }) {
             </div>
             <div className="grid gap-3 sm:grid-cols-[minmax(0,260px)_auto]">
               <input
-                value={query}
+                value={searchTerm}
                 onChange={(e) => {
-                  setQuery(e.target.value);
+                  setSearchTerm(e.target.value);
                   setPage(1);
                 }}
                 placeholder="Search comments or learners"
