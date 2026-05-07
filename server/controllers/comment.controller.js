@@ -1,6 +1,7 @@
 import Comment from "../models/Comment.js";
 import Course from "../models/Course.js";
 import ModerationLog from "../models/ModerationLog.js";
+import mongoose from "mongoose";
 
 export const addComment = async (req, res) => {
   try {
@@ -27,11 +28,63 @@ export const addComment = async (req, res) => {
 
 export const getComments = async (req, res) => {
   try {
-    const comments = await Comment.find({ course: req.params.courseId })
-      .sort({ createdAt: -1 })
-      .populate("user", "name");
+    const { courseId } = req.params;
+    const { page: pageQ, limit: limitQ, q } = req.query;
 
-    res.json(comments);
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ message: "Invalid courseId" });
+    }
+
+    const page = Math.max(1, parseInt(pageQ, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(limitQ, 10) || 10));
+    const skip = (page - 1) * limit;
+    const courseObjectId = new mongoose.Types.ObjectId(courseId);
+
+    const pipeline = [
+      { $match: { course: courseObjectId } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    ];
+
+    if (q && q.trim()) {
+      const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      pipeline.push({
+        $match: {
+          $or: [
+            { content: { $regex: regex } },
+            { "user.name": { $regex: regex } },
+          ],
+        },
+      });
+    }
+
+    pipeline.push({ $sort: { createdAt: -1 } });
+    pipeline.push({
+      $facet: {
+        metadata: [{ $count: "total" }],
+        data: [{ $skip: skip }, { $limit: limit }],
+      },
+    });
+
+    const result = await Comment.aggregate(pipeline);
+    const total = result[0]?.metadata?.[0]?.total || 0;
+    const data = result[0]?.data || [];
+
+    res.json({
+      total,
+      page,
+      limit,
+      pages: Math.max(1, Math.ceil(total / limit)),
+      data,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

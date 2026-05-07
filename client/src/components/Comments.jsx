@@ -2,23 +2,36 @@ import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
-export default function Comments({ courseId, enrolled }) {
+export default function Comments({ courseId, enrolled, course }) {
   const { user } = useAuth();
   const [comments, setComments] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [content, setContent] = useState("");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     let ignore = false;
 
     setLoading(true);
     axios
-      .get(`/comments/${courseId}`)
+      .get(`/comments/${courseId}`, {
+        params: {
+          page,
+          limit: pageSize,
+          ...(query ? { q: query } : {}),
+        },
+      })
       .then((res) => {
         if (ignore) return;
-        setComments(res.data);
+        setComments(res.data.data || []);
+        setTotal(res.data.total || 0);
+        setPages(res.data.pages || 1);
         setError("");
       })
       .catch(() => {
@@ -31,6 +44,10 @@ export default function Comments({ courseId, enrolled }) {
     return () => {
       ignore = true;
     };
+  }, [courseId, page, query]);
+
+  useEffect(() => {
+    setPage(1);
   }, [courseId]);
 
   const isCourseInstructor = Boolean(
@@ -47,7 +64,14 @@ export default function Comments({ courseId, enrolled }) {
     try {
       setSubmitting(true);
       const res = await axios.post("/comments", { courseId, content: content.trim() });
-      setComments((c) => [res.data, ...c]);
+      if (page === 1 && !query) {
+        const nextTotal = total + 1;
+        setComments((current) => [res.data, ...current].slice(0, pageSize));
+        setTotal(nextTotal);
+        setPages(Math.max(1, Math.ceil(nextTotal / pageSize)));
+      } else {
+        setPage(1);
+      }
       setContent("");
     } catch (err) {
       console.error(err.response?.data || err.message);
@@ -59,7 +83,12 @@ export default function Comments({ courseId, enrolled }) {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/comments/${id}`);
-      setComments((c) => c.filter((x) => x._id !== id));
+      setComments((current) => current.filter((x) => x._id !== id));
+      setTotal((current) => {
+        const nextTotal = Math.max(0, current - 1);
+        setPages(Math.max(1, Math.ceil(nextTotal / pageSize)));
+        return nextTotal;
+      });
     } catch (err) {
       console.error(err.response?.data || err.message);
     }
@@ -67,8 +96,12 @@ export default function Comments({ courseId, enrolled }) {
 
   const handleModerate = async (id, hidden) => {
     try {
-      const res = await axios.patch(`/comments/${id}/moderate`, { hidden, reason: hidden ? 'Removed by moderator' : 'Unhidden by moderator' });
-      setComments((c) => c.map((x) => (x._id === id ? res.data : x)));
+      const res = await axios.patch(`/comments/${id}/moderate`, {
+        hidden,
+        reason: hidden ? "Removed by moderator" : "Unhidden by moderator",
+      });
+
+      setComments((current) => current.map((x) => (x._id === id ? res.data : x)));
     } catch (err) {
       console.error(err.response?.data || err.message);
     }
@@ -78,8 +111,26 @@ export default function Comments({ courseId, enrolled }) {
     <section className="mx-auto max-w-7xl px-5 pb-10 sm:px-8">
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-200 p-5 sm:p-6">
-          <h2 className="text-2xl font-bold">Comments</h2>
-          <p className="mt-1 text-sm text-slate-500">Course discussion and questions.</p>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">Comments</h2>
+              <p className="mt-1 text-sm text-slate-500">Course discussion and questions.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,260px)_auto]">
+              <input
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search comments or learners"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+              />
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                {total} comment{total === 1 ? "" : "s"}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="p-6">
@@ -124,12 +175,13 @@ export default function Comments({ courseId, enrolled }) {
                 <article key={c._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-bold text-slate-900">{c.user?.name || 'Learner'}</p>
+                      <p className="font-bold text-slate-900">{c.user?.name || "Learner"}</p>
                       <p className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {(String(c.user?._id || c.user) === String(user?._id) || user?.role === 'admin') && (
+                      {(String(c.user?._id || c.user) === String(user?._id) || user?.role === "admin") && (
                         <button
+                          type="button"
                           onClick={() => handleDelete(c._id)}
                           className="text-sm font-semibold text-rose-600"
                         >
@@ -140,6 +192,7 @@ export default function Comments({ courseId, enrolled }) {
                       {canModerate && (
                         c.hidden ? (
                           <button
+                            type="button"
                             onClick={() => handleModerate(c._id, false)}
                             className="text-sm font-semibold text-emerald-700"
                           >
@@ -147,6 +200,7 @@ export default function Comments({ courseId, enrolled }) {
                           </button>
                         ) : (
                           <button
+                            type="button"
                             onClick={() => handleModerate(c._id, true)}
                             className="text-sm font-semibold text-rose-600"
                           >
@@ -169,6 +223,31 @@ export default function Comments({ courseId, enrolled }) {
               No comments yet. Start the discussion by posting a comment.
             </div>
           )}
+
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
+            <div className="text-sm text-slate-600">
+              Page {page} / {pages}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={page <= 1}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                className="rounded-md border px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                disabled={page >= pages}
+                onClick={() => setPage((current) => Math.min(pages, current + 1))}
+                className="rounded-md border px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
           {error && <p className="mt-3 text-sm text-rose-700">{error}</p>}
         </div>
       </div>
