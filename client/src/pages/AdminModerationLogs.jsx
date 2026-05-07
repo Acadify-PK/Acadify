@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminModerationLogs() {
   const { user } = useAuth();
-  const [logs, setLogs] = useState([]);
+  const [data, setData] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -18,11 +20,19 @@ export default function AdminModerationLogs() {
   useEffect(() => {
     let ignore = false;
     setLoading(true);
+    
+    const params = { page, limit: pageSize };
+    if (courseId) params.courseId = courseId;
+    if (actionFilter !== 'all') params.action = actionFilter;
+    if (query) params.q = query;
+
     axios
-      .get('/moderation', { params: courseId ? { courseId } : {} })
+      .get('/moderation', { params })
       .then((res) => {
         if (ignore) return;
-        setLogs(res.data || []);
+        setData(res.data.data || []);
+        setTotal(res.data.total || 0);
+        setPages(res.data.pages || 1);
         setError('');
       })
       .catch((err) => {
@@ -33,32 +43,14 @@ export default function AdminModerationLogs() {
       });
 
     return () => { ignore = true; };
-  }, [courseId]);
-
-  const filtered = useMemo(() => {
-    return logs.filter((l) => {
-      if (actionFilter !== 'all' && l.action !== actionFilter) return false;
-      if (query) {
-        const q = query.toLowerCase();
-        if (!(
-          (l.moderator?.name || '').toLowerCase().includes(q)
-          || (l.comment?.content || '').toLowerCase().includes(q)
-          || (l.reason || '').toLowerCase().includes(q)
-        )) return false;
-      }
-      return true;
-    });
-  }, [logs, actionFilter, query]);
-
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const pageItems = filtered.slice((page - 1) * pageSize, page * pageSize);
+  }, [courseId, actionFilter, query, page]);
 
   const exportCSV = () => {
     const rows = [
       ['Timestamp','Action','Course','Comment','Moderator','ModeratorRole','Reason','PreviousState','NewState']
     ];
 
-    filtered.forEach((r) => {
+    data.forEach((r) => {
       rows.push([
         new Date(r.createdAt).toISOString(),
         r.action,
@@ -102,16 +94,16 @@ export default function AdminModerationLogs() {
         </div>
 
         <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm text-slate-600">{loading ? 'Loading...' : `${filtered.length} logs`}</div>
+          <div className="text-sm text-slate-600">{loading ? 'Loading...' : `${total} logs found`}</div>
           <div className="flex items-center gap-3">
-            <button onClick={() => { setPage(1); exportCSV(); }} className="rounded-md bg-cyan-700 px-3 py-2 text-sm font-semibold text-white">Export CSV</button>
+            <button onClick={exportCSV} className="rounded-md bg-cyan-700 px-3 py-2 text-sm font-semibold text-white">Export CSV</button>
           </div>
         </div>
 
         {error && <div className="mb-4 rounded-md bg-rose-50 p-4 text-rose-700">{error}</div>}
 
         <div className="space-y-3">
-          {pageItems.map((log) => (
+          {data.map((log) => (
             <div key={log._id} className="rounded-lg border bg-white p-4">
               <div className="flex items-start justify-between">
                 <div>
@@ -132,10 +124,10 @@ export default function AdminModerationLogs() {
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-slate-600">Page {page} / {pageCount}</div>
+          <div className="text-sm text-slate-600">Page {page} / {pages}</div>
           <div className="flex items-center gap-2">
             <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-md border px-3 py-1 disabled:opacity-50">Previous</button>
-            <button disabled={page >= pageCount} onClick={() => setPage((p) => Math.min(pageCount, p + 1))} className="rounded-md border px-3 py-1 disabled:opacity-50">Next</button>
+            <button disabled={page >= pages} onClick={() => setPage((p) => Math.min(pages, p + 1))} className="rounded-md border px-3 py-1 disabled:opacity-50">Next</button>
           </div>
         </div>
       </div>
