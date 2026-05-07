@@ -15,6 +15,7 @@ export default function Comments({ courseId, enrolled, course }) {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -51,6 +52,7 @@ export default function Comments({ courseId, enrolled, course }) {
   useEffect(() => {
     const t = setTimeout(() => {
       setQuery(searchTerm);
+      setIsSearching(false);
     }, 500);
 
     return () => clearTimeout(t);
@@ -132,12 +134,22 @@ export default function Comments({ courseId, enrolled, course }) {
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setPage(1);
+                  setIsSearching(true);
                 }}
                 placeholder="Search comments or learners"
                 className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
               />
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
-                {total} comment{total === 1 ? "" : "s"}
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                {isSearching ? (
+                  <>
+                    <div className="h-3 w-3 animate-spin rounded-full border border-cyan-200 border-t-cyan-600"></div>
+                    <span>Searching...</span>
+                  </>
+                ) : (
+                  <>
+                    {total} comment{total === 1 ? "" : "s"}
+                  </>
+                )}
               </div>
             </div>
           </div>

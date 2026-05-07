@@ -115,7 +115,21 @@ export default function AdminModerationLogs() {
         </div>
 
         <div className="mb-4 flex items-center justify-between">
-          <div className="text-sm text-slate-600">{loading ? 'Loading...' : isSearching ? 'Searching...' : `${total} logs found`}</div>
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            {loading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600"></div>
+                <span>Loading...</span>
+              </>
+            ) : isSearching ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-200 border-t-cyan-600"></div>
+                <span>Searching...</span>
+              </>
+            ) : (
+              <span>{total} logs found</span>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <button onClick={exportCSV} className="rounded-md bg-cyan-700 px-3 py-2 text-sm font-semibold text-white">Export CSV</button>
           </div>
