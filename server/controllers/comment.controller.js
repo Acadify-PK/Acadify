@@ -2,6 +2,7 @@ import Comment from "../models/Comment.js";
 import Course from "../models/Course.js";
 import ModerationLog from "../models/ModerationLog.js";
 import Notification from "../models/Notification.js";
+import { pushExternalNotification } from "../services/notification.service.js";
 import mongoose from "mongoose";
 
 export const addComment = async (req, res) => {
@@ -37,6 +38,7 @@ export const addComment = async (req, res) => {
         message: `${req.user.name} recently commented on your course "${courseObj.title}"`,
         link: `/course/${courseId}`,
       });
+      pushExternalNotification(courseObj.instructor, `New comment on your course "${courseObj.title}": ${content.slice(0, 50)}...`);
     }
 
     res.status(201).json(populated);
@@ -227,6 +229,7 @@ export const moderateComment = async (req, res) => {
         message: `Your comment was ${comment.hidden ? 'hidden' : 'unhidden'} by a moderator: ${reason || 'No reason provided'}`,
         link: `/course/${comment.course}`,
       });
+      pushExternalNotification(comment.user, `Moderation update: Your comment on Acadify was ${comment.hidden ? 'hidden' : 'unhidden'}.`);
     }
 
     // create audit log

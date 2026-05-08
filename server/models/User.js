@@ -22,6 +22,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  integrations: {
+    slackWebhook: { type: String, default: "" },
+    slackEnabled: { type: Boolean, default: false },
+    discordWebhook: { type: String, default: "" },
+    discordEnabled: { type: Boolean, default: false },
+    googleCalendarEnabled: { type: Boolean, default: false },
+    googleAccessToken: { type: String },
+    googleRefreshToken: { type: String },
+    googleIdToken: { type: String },
+  },
 }, { timestamps: true });
 
 // 🔐 hash before save

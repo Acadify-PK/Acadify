@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import IntegrationsSettings from "../components/IntegrationsSettings";
 
 function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("courses");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,11 +27,29 @@ function StudentDashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        My Learning
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">
+          Student Dashboard
+        </h1>
+        <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <button 
+            onClick={() => setActiveTab("courses")}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === "courses" ? "bg-white shadow text-blue-600" : "text-gray-600 hover:text-gray-900"}`}
+          >
+            My Courses
+          </button>
+          <button 
+            onClick={() => setActiveTab("integrations")}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${activeTab === "integrations" ? "bg-white shadow text-blue-600" : "text-gray-600 hover:text-gray-900"}`}
+          >
+            Integrations
+          </button>
+        </div>
+      </div>
 
-      {courses.length === 0 ? (
+      {activeTab === "integrations" ? (
+        <IntegrationsSettings />
+      ) : courses.length === 0 ? (
         <div className="text-center py-10 border rounded-xl bg-gray-50">
             <p className="text-gray-500 mb-4">You haven't enrolled in any courses yet.</p>
             <button 

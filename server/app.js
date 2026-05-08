@@ -15,6 +15,7 @@ import certificateRoutes from "./routes/certificate.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import moderationRoutes from "./routes/moderation.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import integrationRoutes from "./routes/integration.routes.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/integrations", integrationRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });
