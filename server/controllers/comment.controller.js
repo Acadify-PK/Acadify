@@ -12,10 +12,16 @@ export const addComment = async (req, res) => {
       return res.status(400).json({ message: "Content is required" });
     }
 
+    // Check if user is shadow banned
+    const isShadowBanned = req.user.isShadowBanned || false;
+
     const comment = await Comment.create({
       user: userId,
       course: courseId,
       content: content.trim(),
+      hidden: isShadowBanned, // Auto-hide if shadow banned
+      moderationReason: isShadowBanned ? "Auto-hidden (Shadow Banned User)" : undefined,
+      moderatedAt: isShadowBanned ? new Date() : undefined,
     });
 
     const populated = await comment.populate("user", "name");
@@ -30,6 +36,7 @@ export const getComments = async (req, res) => {
   try {
     const { courseId } = req.params;
     const { page: pageQ, limit: limitQ, q } = req.query;
+    const currentUserId = req.user?._id;
 
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ message: "Invalid courseId" });
@@ -40,8 +47,26 @@ export const getComments = async (req, res) => {
     const skip = (page - 1) * limit;
     const courseObjectId = new mongoose.Types.ObjectId(courseId);
 
+    // Visibility logic:
+    // 1. Show all non-hidden comments
+    // 2. If logged in, also show your OWN hidden comments (for shadow-ban effect)
+    // 3. Admin/Instructor see all hidden anyway? Let's keep it simple:
+    //    Everyone sees non-hidden. Owners see their own hidden. 
+    //    Moderators see all (we'll add that match later if needed)
+
+    const baseMatch = { course: courseObjectId };
+    
+    if (currentUserId) {
+      baseMatch.$or = [
+        { hidden: false },
+        { user: new mongoose.Types.ObjectId(currentUserId) }
+      ];
+    } else {
+      baseMatch.hidden = false;
+    }
+
     const pipeline = [
-      { $match: { course: courseObjectId } },
+      { $match: baseMatch },
       {
         $lookup: {
           from: "users",

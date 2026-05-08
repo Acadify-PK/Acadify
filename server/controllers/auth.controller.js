@@ -30,6 +30,8 @@ export const register = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                isShadowBanned: user.isShadowBanned,
+                isFlagged: user.isFlagged,
             });
 
     } catch (error) {
@@ -57,6 +59,8 @@ export const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                isShadowBanned: user.isShadowBanned,
+                isFlagged: user.isFlagged,
             });
 
     } catch (error) {
@@ -70,6 +74,8 @@ export const me = (req, res) => {
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
+        isShadowBanned: req.user.isShadowBanned,
+        isFlagged: req.user.isFlagged,
     });
 };
 

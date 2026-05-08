@@ -1,6 +1,56 @@
 import mongoose from 'mongoose';
 import ModerationLog from "../models/ModerationLog.js";
 import Course from "../models/Course.js";
+import User from "../models/User.js";
+
+export const updateUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { isShadowBanned, isFlagged, moderationNotes, reason } = req.body;
+
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only admins can update user global status' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const previousState = {
+      isShadowBanned: user.isShadowBanned,
+      isFlagged: user.isFlagged,
+      moderationNotes: user.moderationNotes,
+    };
+
+    if (isShadowBanned !== undefined) user.isShadowBanned = isShadowBanned;
+    if (isFlagged !== undefined) user.isFlagged = isFlagged;
+    if (moderationNotes !== undefined) user.moderationNotes = moderationNotes;
+
+    await user.save();
+
+    await ModerationLog.create({
+      action: 'update_user_status',
+      moderator: req.user._id,
+      moderatorRole: req.user.role,
+      reason: reason || 'Admin updated user status',
+      previousState,
+      newState: {
+        isShadowBanned: user.isShadowBanned,
+        isFlagged: user.isFlagged,
+        moderationNotes: user.moderationNotes,
+      },
+    });
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      isShadowBanned: user.isShadowBanned,
+      isFlagged: user.isFlagged,
+      moderationNotes: user.moderationNotes,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const getModerationLogs = async (req, res) => {
   try {

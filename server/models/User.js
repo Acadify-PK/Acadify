@@ -10,6 +10,18 @@ const userSchema = new mongoose.Schema({
         enum: ["student", "instructor", "admin"],
         default: "student",
     },
+  isShadowBanned: {
+    type: Boolean,
+    default: false,
+  },
+  isFlagged: {
+    type: Boolean,
+    default: false,
+  },
+  moderationNotes: {
+    type: String,
+    default: "",
+  },
 }, { timestamps: true });
 
 // 🔐 hash before save

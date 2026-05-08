@@ -20,6 +20,18 @@ export default function AdminModerationLogs() {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
+  const handleUpdateStatus = async (userId, update, reason) => {
+    try {
+      if (!window.confirm(`Are you sure you want to update this user's moderation status?`)) return;
+      await axios.patch(`/moderation/user/${userId}`, { ...update, reason });
+      alert("User status updated successfully");
+      // refresh current page
+      setPage(page);
+    } catch (err) {
+      alert(err.response?.data?.message || "Error updating user status");
+    }
+  };
+
   useEffect(() => {
     let ignore = false;
     setLoading(true);
@@ -150,7 +162,25 @@ export default function AdminModerationLogs() {
 
               <div className="mt-3 text-sm text-slate-700">
                 <div><strong>Comment:</strong> {log.comment?.content || '[deleted]'}</div>
-                <div className="mt-1"><strong>Moderator:</strong> {log.moderator?.name || '—'} ({log.moderatorRole})</div>
+                <div className="mt-1 flex items-center justify-between">
+                  <div><strong>Moderator:</strong> {log.moderator?.name || '—'} ({log.moderatorRole})</div>
+                  {user?.role === 'admin' && log.comment?.user && (
+                    <div className="flex gap-2">
+                       <button 
+                        onClick={() => handleUpdateStatus(log.comment.user, { isShadowBanned: true }, "Manual shadow ban via logs")}
+                        className="text-xs font-semibold text-amber-600 hover:underline"
+                      >
+                        Shadow Ban
+                      </button>
+                      <button 
+                        onClick={() => handleUpdateStatus(log.comment.user, { isFlagged: true }, "Flagged via logs")}
+                        className="text-xs font-semibold text-rose-600 hover:underline"
+                      >
+                        Flag Account
+                      </button>
+                    </div>
+                  )}
+                </div>
                 {log.reason && <div className="mt-1 text-sm text-slate-500"><strong>Reason:</strong> {log.reason}</div>}
                 <div className="mt-2 text-xs text-slate-400">Prev: {JSON.stringify(log.previousState || {})} → New: {JSON.stringify(log.newState || {})}</div>
               </div>
