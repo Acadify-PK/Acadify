@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import ModerationLog from "../models/ModerationLog.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 export const updateUserStatus = async (req, res) => {
   try {
@@ -39,6 +40,16 @@ export const updateUserStatus = async (req, res) => {
         moderationNotes: user.moderationNotes,
       },
     });
+
+    // Notify user if status changed
+    if (isFlagged === true || isShadowBanned === true) {
+      await Notification.create({
+        recipient: userId,
+        sender: req.user._id,
+        type: "user_status_update",
+        message: `Your account status has been updated by an admin. Reason: ${reason || 'Violation of terms'}`,
+      });
+    }
 
     res.json({
       _id: user._id,

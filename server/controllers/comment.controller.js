@@ -1,6 +1,7 @@
 import Comment from "../models/Comment.js";
 import Course from "../models/Course.js";
 import ModerationLog from "../models/ModerationLog.js";
+import Notification from "../models/Notification.js";
 import mongoose from "mongoose";
 
 export const addComment = async (req, res) => {
@@ -25,6 +26,18 @@ export const addComment = async (req, res) => {
     });
 
     const populated = await comment.populate("user", "name");
+
+    // Course instructor notification
+    const courseObj = await Course.findById(courseId).select("instructor title");
+    if (courseObj && String(courseObj.instructor) !== String(userId)) {
+      await Notification.create({
+        recipient: courseObj.instructor,
+        sender: userId,
+        type: "new_comment",
+        message: `${req.user.name} recently commented on your course "${courseObj.title}"`,
+        link: `/course/${courseId}`,
+      });
+    }
 
     res.status(201).json(populated);
   } catch (error) {
@@ -204,6 +217,17 @@ export const moderateComment = async (req, res) => {
     await comment.save();
 
     const populated = await comment.populate("user", "name").populate("moderatedBy", "name");
+
+    // Notification for user
+    if (String(comment.user) !== String(req.user._id)) {
+      await Notification.create({
+        recipient: comment.user,
+        sender: req.user._id,
+        type: "comment_moderated",
+        message: `Your comment was ${comment.hidden ? 'hidden' : 'unhidden'} by a moderator: ${reason || 'No reason provided'}`,
+        link: `/course/${comment.course}`,
+      });
+    }
 
     // create audit log
     await ModerationLog.create({

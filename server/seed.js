@@ -46,7 +46,24 @@ const seed = async () => {
         const instructors = [];
         const students = [];
 
-        for (let i = 0; i < 10; i++) {
+        // Create Admin
+        await User.create({
+            name: "Admin User",
+            email: "admin@acadify.com",
+            password: "adminpassword",
+            role: "admin",
+        });
+
+        // Create specific Instructor
+        const testInstructor = await User.create({
+            name: "Test Instructor",
+            email: "instructor@acadify.com",
+            password: "password123",
+            role: "instructor",
+        });
+        instructors.push(testInstructor);
+
+        for (let i = 0; i < 9; i++) {
             instructors.push(
                 await User.create({
                     name: faker.person.fullName(),

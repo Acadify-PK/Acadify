@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import NotificationsDropdown from "../components/NotificationsDropdown";
 
 function Home() {
   const { user, logout } = useAuth();
@@ -114,6 +115,8 @@ function Home() {
 
           {user ? (
             <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
+              <NotificationsDropdown />
+              <div className="h-8 w-px bg-slate-200 mx-1"></div>
               <Link
                 to="/dashboard"
                 className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
