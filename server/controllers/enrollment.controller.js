@@ -3,6 +3,9 @@ import Course from "../models/Course.js";
 import Progress from "../models/Progress.js";
 import Section from "../models/Section.js";
 import Lecture from "../models/Lecture.js";
+import User from "../models/User.js";
+import { createCalendarEvent } from "../services/googleCalendar.service.js";
+import { pushExternalNotification } from "../services/notification.service.js";
 
 export const getMyCourses = async (req, res) => {
     try {
@@ -77,6 +80,33 @@ export const enrollCourse = async (req, res) => {
             user: userId,
             course: courseId,
         });
+
+        // Google Calendar Event Integration
+        const user = await User.findById(userId);
+        if (user && user.integrations?.googleCalendarEnabled && user.integrations?.googleRefreshToken) {
+            try {
+                // We create a "Course Learning Milestone" event 7 days from now
+                // to warn the user or set a commitment goal.
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                nextWeek.setHours(10, 0, 0, 0); // 10:00 AM
+
+                const endTime = new Date(nextWeek);
+                endTime.setHours(11, 0, 0, 0); // 1-hour block
+
+                await createCalendarEvent(user, {
+                    title: `📚 Learning Goal: ${course.title}`,
+                    description: `This is a reminder to continue your progress in the course "${course.title}". Consistency is key to mastery!`,
+                    startTime: nextWeek.toISOString(),
+                    endTime: endTime.toISOString()
+                });
+
+                // Also push a confirmation to Discord/Slack if enabled
+                pushExternalNotification(userId, `📅 Success! A learning goal for "${course.title}" has been added to your Google Calendar for next week.`);
+            } catch (calError) {
+                console.error("Failed to auto-create calendar event", calError.message);
+            }
+        }
 
         res.status(201).json(enrollment);
     } catch (error) {
