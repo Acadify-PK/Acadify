@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import { Filter, ChevronDown, ChevronUp, Search as SearchIcon, X } from "lucide-react";
+
 function Home() {
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [totalCourses, setTotalCourses] = useState(0);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     minPrice: "",
     maxPrice: "",
@@ -101,99 +104,119 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
               Course Catalog
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Select a course to view its curriculum and start learning.
             </p>
           </div>
-        </div>
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Search courses</span>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 sm:min-w-[300px]">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="search"
-                placeholder="Search courses by title, description, or category..."
+                placeholder="Search courses..."
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
+                className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Sort by</span>
-              <select
-                value={filters.sort}
-                onChange={(e) =>
-                  setFilters((current) => ({ ...current, sort: e.target.value }))
-                }
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
-              >
-                <option value="newest">Newest</option>
-                <option value="price_asc">Price: Low → High</option>
-                <option value="price_desc">Price: High → Low</option>
-                <option value="rating_desc">Top Rated</option>
-              </select>
-            </label>
+            </div>
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                isFilterOpen || Object.values(filters).some(v => v !== "" && v !== "newest")
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                  : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {isFilterOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
           </div>
+        </div>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Min price</span>
-              <input
-                placeholder="0"
-                type="number"
-                min="0"
-                value={filters.minPrice}
-                onChange={(e) => {
-                  setFilters((current) => ({ ...current, minPrice: e.target.value }));
-                  setPage(1);
-                }}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
-              />
-            </label>
+        {isFilterOpen && (
+          <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Sort by</span>
+                <select
+                  value={filters.sort}
+                  onChange={(e) =>
+                    setFilters((current) => ({ ...current, sort: e.target.value }))
+                  }
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="rating_desc">Top Rated</option>
+                </select>
+              </label>
 
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Max price</span>
-              <input
-                placeholder="100000"
-                type="number"
-                min="0"
-                value={filters.maxPrice}
-                onChange={(e) => {
-                  setFilters((current) => ({ ...current, maxPrice: e.target.value }));
-                  setPage(1);
-                }}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
-              />
-            </label>
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Min Price</span>
+                <div className="relative mt-2">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                  <input
+                    placeholder="0"
+                    type="number"
+                    min="0"
+                    value={filters.minPrice}
+                    onChange={(e) => {
+                      setFilters((current) => ({ ...current, minPrice: e.target.value }));
+                      setPage(1);
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-4 py-2.5 text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white"
+                  />
+                </div>
+              </label>
 
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Minimum rating</span>
-              <select
-                value={filters.minRating}
-                onChange={(e) => {
-                  setFilters((current) => ({ ...current, minRating: e.target.value }));
-                  setPage(1);
-                }}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
-              >
-                <option value="">All ratings</option>
-                <option value="4">4 stars & above</option>
-                <option value="3">3 stars & above</option>
-                <option value="2">2 stars & above</option>
-              </select>
-            </label>
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Max Price</span>
+                <div className="relative mt-2">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                  <input
+                    placeholder="Infinity"
+                    type="number"
+                    min="0"
+                    value={filters.maxPrice}
+                    onChange={(e) => {
+                      setFilters((current) => ({ ...current, maxPrice: e.target.value }));
+                      setPage(1);
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-4 py-2.5 text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white"
+                  />
+                </div>
+              </label>
 
-            <div className="flex items-end">
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Rating</span>
+                <select
+                  value={filters.minRating}
+                  onChange={(e) => {
+                    setFilters((current) => ({ ...current, minRating: e.target.value }));
+                    setPage(1);
+                  }}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium outline-none transition focus:border-blue-500 focus:bg-white"
+                >
+                  <option value="">All Ratings</option>
+                  <option value="4">4+ Stars</option>
+                  <option value="3">3+ Stars</option>
+                  <option value="2">2+ Stars</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-6">
               <button
                 type="button"
                 onClick={() => {
@@ -206,13 +229,20 @@ function Home() {
                     sort: "newest",
                   });
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors"
               >
-                Clear filters
+                <X className="w-4 h-4" />
+                Reset All
+              </button>
+              <button
+                onClick={() => setIsFilterOpen(false)}
+                className="px-6 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-black/5"
+              >
+                Apply Filters
               </button>
             </div>
           </div>
-        </div>
+        )}
 
         {loading && (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
