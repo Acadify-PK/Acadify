@@ -108,25 +108,25 @@ export default function AdminModerationLogs() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb] p-6">
+    <main className="min-h-screen bg-[#f7f8fb] dark:bg-gray-950 p-6 text-slate-950 dark:text-white">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Moderation Audit Logs</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Moderation Audit Logs</h1>
         </div>
 
         <div className="mb-4 grid gap-3 sm:grid-cols-4">
-          <input value={courseIdTerm} onChange={(e) => { setCourseIdTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Filter by courseId" className="rounded-md border px-3 py-2" />
-          <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} className="rounded-md border px-3 py-2">
+          <input value={courseIdTerm} onChange={(e) => { setCourseIdTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Filter by courseId" className="rounded-md border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-slate-950 dark:text-white outline-none focus:border-cyan-500" />
+          <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)} className="rounded-md border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-slate-950 dark:text-white outline-none focus:border-cyan-500">
             <option value="all">All actions</option>
             <option value="hide">Hide</option>
             <option value="unhide">Unhide</option>
             <option value="delete">Delete</option>
           </select>
-          <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Search moderator/comment/reason" className="rounded-md border px-3 py-2 col-span-2" />
+          <input value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); setIsSearching(true); }} placeholder="Search moderator/comment/reason" className="rounded-md border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-slate-950 dark:text-white col-span-2 outline-none focus:border-cyan-500" />
         </div>
 
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-gray-400">
             {loading ? (
               <>
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600"></div>
@@ -142,56 +142,58 @@ export default function AdminModerationLogs() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={exportCSV} className="rounded-md bg-cyan-700 px-3 py-2 text-sm font-semibold text-white">Export CSV</button>
+            <button onClick={exportCSV} className="rounded-md bg-cyan-700 dark:bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-800 dark:hover:bg-cyan-500 transition-colors">Export CSV</button>
           </div>
         </div>
 
-        {error && <div className="mb-4 rounded-md bg-rose-50 p-4 text-rose-700">{error}</div>}
+        {error && <div className="mb-4 rounded-md bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 p-4 text-rose-700 dark:text-rose-400">{error}</div>}
 
         <div className="space-y-3">
           {data.map((log) => (
-            <div key={log._id} className="rounded-lg border bg-white p-4">
+            <div key={log._id} className="rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-sm text-slate-500">{new Date(log.createdAt).toLocaleString()}</div>
-                  <div className="mt-1 font-semibold">{log.action.toUpperCase()}</div>
+                  <div className="text-sm text-slate-500 dark:text-gray-400">{new Date(log.createdAt).toLocaleString()}</div>
+                  <div className="mt-1 font-semibold text-slate-900 dark:text-white">{log.action.toUpperCase()}</div>
                 </div>
-                <div className="text-sm text-slate-500">Course: {log.course}</div>
+                <div className="text-sm text-slate-500 dark:text-gray-400 font-mono">ID: {log.course}</div>
               </div>
 
-              <div className="mt-3 text-sm text-slate-700">
-                <div><strong>Comment:</strong> {log.comment?.content || '[deleted]'}</div>
-                <div className="mt-1 flex items-center justify-between">
+              <div className="mt-3 text-sm text-slate-700 dark:text-gray-300">
+                <div className="bg-slate-50 dark:bg-gray-800/50 p-3 rounded-md border border-slate-100 dark:border-gray-800">
+                  <strong>Comment:</strong> {log.comment?.content || '[deleted]'}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
                   <div><strong>Moderator:</strong> {log.moderator?.name || '—'} ({log.moderatorRole})</div>
                   {user?.role === 'admin' && log.comment?.user && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-4">
                        <button 
                         onClick={() => handleUpdateStatus(log.comment.user, { isShadowBanned: true }, "Manual shadow ban via logs")}
-                        className="text-xs font-semibold text-amber-600 hover:underline"
+                        className="text-xs font-bold text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 uppercase tracking-wider"
                       >
                         Shadow Ban
                       </button>
                       <button 
                         onClick={() => handleUpdateStatus(log.comment.user, { isFlagged: true }, "Flagged via logs")}
-                        className="text-xs font-semibold text-rose-600 hover:underline"
+                        className="text-xs font-bold text-rose-600 dark:text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 uppercase tracking-wider"
                       >
                         Flag Account
                       </button>
                     </div>
                   )}
                 </div>
-                {log.reason && <div className="mt-1 text-sm text-slate-500"><strong>Reason:</strong> {log.reason}</div>}
-                <div className="mt-2 text-xs text-slate-400">Prev: {JSON.stringify(log.previousState || {})} → New: {JSON.stringify(log.newState || {})}</div>
+                {log.reason && <div className="mt-2 text-sm text-slate-500 dark:text-gray-400 italic"><strong>Reason:</strong> {log.reason}</div>}
+                <div className="mt-3 text-xs text-slate-400 dark:text-gray-500 border-t border-slate-50 dark:border-gray-800 pt-2 font-mono">Prev: {JSON.stringify(log.previousState || {})} → New: {JSON.stringify(log.newState || {})}</div>
               </div>
             </div>
           ))}
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-slate-600">Page {page} / {pages}</div>
+          <div className="text-sm text-slate-600 dark:text-gray-400">Page {page} / {pages}</div>
           <div className="flex items-center gap-2">
-            <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-md border px-3 py-1 disabled:opacity-50">Previous</button>
-            <button disabled={page >= pages} onClick={() => setPage((p) => Math.min(pages, p + 1))} className="rounded-md border px-3 py-1 disabled:opacity-50">Next</button>
+            <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="rounded-md border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1 text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-50">Previous</button>
+            <button disabled={page >= pages} onClick={() => setPage((p) => Math.min(pages, p + 1))} className="rounded-md border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-1 text-sm font-semibold text-slate-700 dark:text-gray-300 transition-colors hover:bg-slate-50 dark:hover:bg-gray-800 disabled:opacity-50">Next</button>
           </div>
         </div>
       </div>

@@ -34,25 +34,25 @@ function StudentDashboard() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             Student Dashboard
           </h1>
-          <p className="text-gray-500 mt-1">Welcome back! Here's your learning progress.</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's your learning progress.</p>
         </div>
-        <div className="flex gap-2 bg-gray-100 p-1.5 rounded-xl border border-gray-200">
+        <div className="flex gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
           <button 
             onClick={() => setActiveTab("courses")}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${activeTab === "courses" ? "bg-white shadow-sm text-blue-600 ring-1 ring-black/5" : "text-gray-600 hover:text-gray-900"}`}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${activeTab === "courses" ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400 ring-1 ring-black/5" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}
           >
             <BookOpen className="w-4 h-4" />
             My Courses
           </button>
           <button 
             onClick={() => setActiveTab("integrations")}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${activeTab === "integrations" ? "bg-white shadow-sm text-blue-600 ring-1 ring-black/5" : "text-gray-600 hover:text-gray-900"}`}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${activeTab === "integrations" ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400 ring-1 ring-black/5" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}
           >
             <Settings className="w-4 h-4" />
             Integrations
@@ -63,18 +63,18 @@ function StudentDashboard() {
       {activeTab === "courses" && courses.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Courses", value: stats.total, icon: BookOpen, color: "bg-blue-50 text-blue-700" },
-            { label: "In Progress", value: stats.inProgress, icon: Zap, color: "bg-yellow-50 text-yellow-700" },
-            { label: "Completed", value: stats.completed, icon: CheckCircle, color: "bg-green-50 text-green-700" },
-            { label: "Avg. Progress", value: `${stats.avgProgress}%`, icon: TrendingUp, color: "bg-purple-50 text-purple-700" },
+            { label: "Total Courses", value: stats.total, icon: BookOpen, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300" },
+            { label: "In Progress", value: stats.inProgress, icon: Zap, color: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300" },
+            { label: "Completed", value: stats.completed, icon: CheckCircle, color: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300" },
+            { label: "Avg. Progress", value: `${stats.avgProgress}%`, icon: TrendingUp, color: "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300" },
           ].map((stat, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div key={idx} className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.color}`}>
                 <stat.icon className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.label}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
               </div>
             </div>
           ))}
@@ -84,8 +84,8 @@ function StudentDashboard() {
       {activeTab === "integrations" ? (
         <IntegrationsSettings />
       ) : courses.length === 0 ? (
-        <div className="text-center py-10 border rounded-xl bg-gray-50">
-            <p className="text-gray-500 mb-4">You haven't enrolled in any courses yet.</p>
+        <div className="text-center py-10 border dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-gray-500 dark:text-gray-400 mb-4">You haven't enrolled in any courses yet.</p>
             <button 
                 onClick={() => navigate("/")}
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
@@ -96,7 +96,7 @@ function StudentDashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map(course => (
-            <div key={course._id} className="group relative bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+            <div key={course._id} className="group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
               {course.thumbnail ? (
                 <div className="relative h-48 overflow-hidden">
                   <img 
@@ -118,26 +118,26 @@ function StudentDashboard() {
               
               <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{course.category || 'Course'}</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{course.level || 'Beginner'}</span>
+                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">{course.category || 'Course'}</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                  <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{course.level || 'Beginner'}</span>
                 </div>
 
-                <h2 className="font-bold text-xl mb-2 text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                <h2 className="font-bold text-xl mb-2 text-gray-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {course.title}
                 </h2>
 
-                <p className="text-sm text-gray-500 mb-6 line-clamp-2 leading-relaxed flex-grow">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 leading-relaxed flex-grow">
                   {course.description}
                 </p>
 
                 {/* Progress */}
                 <div className="mb-6">
                     <div className="flex justify-between items-end mb-2">
-                        <span className="text-xs font-bold text-gray-900">Your Progress</span>
-                        <span className="text-sm font-black text-blue-600">{course.progressPercent}%</span>
+                        <span className="text-xs font-bold text-gray-900 dark:text-gray-300">Your Progress</span>
+                        <span className="text-sm font-black text-blue-600 dark:text-blue-400">{course.progressPercent}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden p-0.5">
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 h-3 rounded-full overflow-hidden p-0.5">
                         <div
                             className="bg-gradient-to-r from-blue-600 to-indigo-500 h-full rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${course.progressPercent}%` }}
@@ -147,7 +147,7 @@ function StudentDashboard() {
 
                 <button
                   onClick={() => navigate(`/courses/${course._id}`)}
-                  className="w-full bg-gray-900 group-hover:bg-blue-600 text-white py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 transform active:scale-[0.98] shadow-lg shadow-black/5 hover:shadow-blue-500/25 flex items-center justify-center gap-2"
+                  className="w-full bg-gray-900 dark:bg-blue-600 group-hover:bg-blue-600 dark:group-hover:bg-blue-700 text-white py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 transform active:scale-[0.98] shadow-lg shadow-black/5 hover:shadow-blue-500/25 flex items-center justify-center gap-2"
                 >
                   {course.progressPercent === 0 ? 'Start Learning' : 'Continue Learning'}
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

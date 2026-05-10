@@ -121,12 +121,12 @@ export default function Comments({ courseId, enrolled, course }) {
 
   return (
     <section className="mx-auto max-w-7xl px-5 pb-10 sm:px-8">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 p-5 sm:p-6">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm transition-colors">
+        <div className="border-b border-slate-200 dark:border-gray-800 p-5 sm:p-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 className="text-2xl font-bold">Comments</h2>
-              <p className="mt-1 text-sm text-slate-500">Course discussion and questions.</p>
+              <h2 className="text-2xl font-bold dark:text-white">Comments</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">Course discussion and questions.</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-[minmax(0,260px)_auto]">
               <input
@@ -137,9 +137,9 @@ export default function Comments({ courseId, enrolled, course }) {
                   setIsSearching(true);
                 }}
                 placeholder="Search comments or learners"
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                className="rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/40"
               />
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-2 text-sm text-slate-600 dark:text-gray-400">
                 {isSearching ? (
                   <>
                     <div className="h-3 w-3 animate-spin rounded-full border border-cyan-200 border-t-cyan-600"></div>
@@ -157,11 +157,11 @@ export default function Comments({ courseId, enrolled, course }) {
 
         <div className="p-6">
           {!user ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 p-4 text-sm text-slate-600 dark:text-gray-400">
               Sign in to participate in the discussion.
             </div>
           ) : !canComment ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 p-4 text-sm text-slate-600 dark:text-gray-400">
               Enroll to leave comments.
             </div>
           ) : (
@@ -171,13 +171,13 @@ export default function Comments({ courseId, enrolled, course }) {
                 onChange={(e) => setContent(e.target.value)}
                 rows={3}
                 placeholder="Share a question or note about this course"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-cyan-500"
+                className="w-full rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 text-sm outline-none text-gray-900 dark:text-white focus:border-cyan-500"
               />
               <div className="mt-3 text-right">
                 <button
                   type="submit"
                   disabled={submitting || !content.trim()}
-                  className="inline-flex items-center justify-center rounded-xl bg-cyan-700 px-4 py-2 text-sm font-bold text-white shadow-sm disabled:opacity-70"
+                  className="inline-flex items-center justify-center rounded-xl bg-cyan-700 hover:bg-cyan-600 px-4 py-2 text-sm font-bold text-white shadow-sm disabled:opacity-70 transition-colors"
                 >
                   {submitting ? "Posting..." : "Post comment"}
                 </button>
@@ -188,16 +188,16 @@ export default function Comments({ courseId, enrolled, course }) {
           {loading ? (
             <div className="space-y-3">
               {[1, 2].map((n) => (
-                <div key={n} className="h-20 animate-pulse rounded-2xl border bg-slate-50" />
+                <div key={n} className="h-20 animate-pulse rounded-2xl border dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50" />
               ))}
             </div>
           ) : comments.length ? (
             <div className="space-y-4">
               {comments.map((c) => (
-                <article key={c._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <article key={c._id} className="rounded-2xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 p-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-bold text-slate-900">{c.user?.name || "Learner"}</p>
+                      <p className="font-bold text-slate-900 dark:text-white">{c.user?.name || "Learner"}</p>
                       <p className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleString()}</p>
                     </div>
                     <div className="flex items-center gap-2">

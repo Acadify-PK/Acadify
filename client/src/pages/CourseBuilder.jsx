@@ -173,12 +173,12 @@ function CourseBuilder() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#f7f8fb] p-5 text-slate-950 sm:p-8">
+      <main className="min-h-screen bg-[#f7f8fb] dark:bg-gray-950 p-5 text-slate-950 dark:text-white sm:p-8">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-5 h-6 w-40 animate-pulse rounded bg-slate-200" />
+          <div className="mb-5 h-6 w-40 animate-pulse rounded bg-slate-200 dark:bg-gray-800" />
           <div className="grid gap-5 lg:grid-cols-[420px_minmax(0,1fr)]">
-            <div className="h-[520px] animate-pulse rounded-lg bg-white" />
-            <div className="h-[520px] animate-pulse rounded-lg bg-white" />
+            <div className="h-[520px] animate-pulse rounded-lg bg-white dark:bg-gray-900" />
+            <div className="h-[520px] animate-pulse rounded-lg bg-white dark:bg-gray-900" />
           </div>
         </div>
       </main>
@@ -187,8 +187,8 @@ function CourseBuilder() {
 
   if (!course) {
     return (
-      <main className="min-h-screen bg-[#f7f8fb] p-5 text-slate-950 sm:p-8">
-        <div className="mx-auto max-w-3xl rounded-lg border border-rose-200 bg-rose-50 p-6 text-rose-700">
+      <main className="min-h-screen bg-[#f7f8fb] dark:bg-gray-950 p-5 text-slate-950 dark:text-white sm:p-8">
+        <div className="mx-auto max-w-3xl rounded-lg border border-rose-200 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 p-6 text-rose-700 dark:text-rose-400">
           <p>{error || "Course not found."}</p>
           <Link
             to="/instructor"
@@ -202,38 +202,38 @@ function CourseBuilder() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
+    <main className="min-h-screen bg-[#f7f8fb] dark:bg-gray-950 text-slate-950 dark:text-white">
+      <header className="border-b border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
           <Link
             to="/instructor"
-            className="inline-flex text-sm font-semibold text-cyan-700 hover:text-cyan-800"
+            className="inline-flex text-sm font-semibold text-cyan-700 dark:text-cyan-500 hover:text-cyan-800 dark:hover:text-cyan-400"
           >
             Back to dashboard
           </Link>
 
           <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500">
                 Course Builder
               </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-slate-950 dark:text-white">
                 {course.title}
               </h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+              <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-gray-400">
                 {course.description ||
                   "Add sections and lectures to shape the course experience."}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:min-w-72">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="text-2xl font-bold">{sectionCount}</p>
-                <p className="mt-1 text-sm text-slate-500">Sections</p>
+              <div className="rounded-lg border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 p-4">
+                <p className="text-2xl font-bold text-slate-950 dark:text-white">{sectionCount}</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">Sections</p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                <p className="text-2xl font-bold">{lectureCount}</p>
-                <p className="mt-1 text-sm text-slate-500">Lectures</p>
+              <div className="rounded-lg border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 p-4">
+                <p className="text-2xl font-bold text-slate-950 dark:text-white">{lectureCount}</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">Lectures</p>
               </div>
             </div>
           </div>
@@ -244,18 +244,18 @@ function CourseBuilder() {
         <div className="space-y-5">
           <form
             onSubmit={handleAddSection}
-            className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+            className="rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-500">
               Add Section
             </p>
-            <h2 className="mt-2 text-xl font-bold">Course section</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <h2 className="mt-2 text-xl font-bold text-slate-950 dark:text-white">Course section</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
               Sections organize lectures into a learner-friendly path.
             </p>
 
             <label className="mt-5 block">
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
                 Section title
               </span>
               <input
@@ -267,14 +267,14 @@ function CourseBuilder() {
                 }}
                 placeholder="Introduction"
                 required
-                className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100"
+                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-950 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20"
               />
             </label>
 
             <button
               type="submit"
               disabled={addingSection}
-              className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 disabled:cursor-wait disabled:opacity-70"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-cyan-700 dark:bg-cyan-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 dark:hover:bg-cyan-700 disabled:cursor-wait disabled:opacity-70"
             >
               {addingSection ? "Adding..." : "Add Section"}
             </button>
@@ -282,18 +282,18 @@ function CourseBuilder() {
 
           <form
             onSubmit={handleAddLecture}
-            className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+            className="rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-500">
               Add Lecture
             </p>
-            <h2 className="mt-2 text-xl font-bold">Video lecture</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <h2 className="mt-2 text-xl font-bold text-slate-950 dark:text-white">Video lecture</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
               Add a playable video to an existing section.
             </p>
 
             <label className="mt-5 block">
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
                 Section
               </span>
               <select
@@ -305,7 +305,7 @@ function CourseBuilder() {
                 }}
                 required
                 disabled={sectionCount === 0}
-                className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-950 dark:text-white outline-none transition focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value="">Select Section</option>
                 {course.sections.map((section) => (
@@ -317,7 +317,7 @@ function CourseBuilder() {
             </label>
 
             <label className="mt-4 block">
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
                 Lecture title
               </span>
               <input
@@ -330,12 +330,12 @@ function CourseBuilder() {
                 placeholder="What is React?"
                 required
                 disabled={sectionCount === 0}
-                className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-950 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
             </label>
 
             <label className="mt-4 block">
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
                 Video URL
               </span>
               <input
@@ -348,9 +348,9 @@ function CourseBuilder() {
                 placeholder="Video URL (YouTube or .mp4)"
                 required
                 disabled={sectionCount === 0}
-                className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-950 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
-              <span className="mt-2 block text-xs text-slate-400">
+              <span className="mt-2 block text-xs text-slate-400 dark:text-gray-500">
                 Supports YouTube links and direct MP4 URLs.
               </span>
             </label>
@@ -358,27 +358,27 @@ function CourseBuilder() {
             <button
               type="submit"
               disabled={sectionCount === 0 || addingLecture}
-              className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-cyan-700 dark:bg-cyan-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 dark:hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {addingLecture ? "Adding..." : "Add Lecture"}
             </button>
           </form>
         </div>
 
-        <aside className="rounded-lg border border-slate-200 bg-white shadow-sm lg:sticky lg:top-5 lg:self-start">
-          <div className="border-b border-slate-200 p-5">
+        <aside className="rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm lg:sticky lg:top-5 lg:self-start">
+          <div className="border-b border-slate-200 dark:border-gray-800 p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold">Course Structure</h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <h2 className="text-xl font-bold text-slate-950 dark:text-white">Course Structure</h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-gray-400">
                   Live preview of sections and lectures.
                 </p>
               </div>
               <span
                 className={`rounded-md px-3 py-1 text-xs font-bold ${
                   course.published
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-amber-50 text-amber-700"
+                    ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400"
+                    : "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400"
                 }`}
               >
                 {course.published ? "Published" : "Draft"}
@@ -390,7 +390,7 @@ function CourseBuilder() {
                 type="button"
                 onClick={handlePublish}
                 disabled={course.published || publishing}
-                className="inline-flex items-center justify-center rounded-md bg-slate-950 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center rounded-md bg-slate-950 dark:bg-gray-800 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 dark:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {course.published
                   ? "Already Published"
@@ -400,20 +400,20 @@ function CourseBuilder() {
               </button>
 
               {refreshing && (
-                <span className="rounded-md bg-cyan-50 px-3 py-2 text-xs font-bold text-cyan-700">
+                <span className="rounded-md bg-cyan-50 dark:bg-cyan-900/20 px-3 py-2 text-xs font-bold text-cyan-700 dark:text-cyan-400">
                   Updating structure
                 </span>
               )}
             </div>
 
             {status && (
-              <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+              <div className="mt-4 rounded-md border border-emerald-200 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                 {status}
               </div>
             )}
 
             {error && (
-              <div className="mt-4 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+              <div className="mt-4 rounded-md border border-rose-200 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 px-4 py-3 text-sm font-semibold text-rose-700 dark:text-rose-400">
                 {error}
               </div>
             )}
@@ -421,9 +421,9 @@ function CourseBuilder() {
 
           <div className="max-h-[calc(100vh-230px)] overflow-y-auto p-5">
             {sectionCount === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                <h3 className="font-bold text-slate-900">No sections yet</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-500">
+              <div className="rounded-lg border border-dashed border-slate-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 p-6 text-center">
+                <h3 className="font-bold text-slate-900 dark:text-white">No sections yet</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-gray-400">
                   Add your first section to begin shaping the course.
                 </p>
               </div>
@@ -432,12 +432,12 @@ function CourseBuilder() {
                 {course.sections.map((section, sectionIndex) => (
                   <section
                     key={section._id}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                    className="rounded-lg border border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-800/50 p-4"
                   >
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-gray-500">
                       Section {sectionIndex + 1}
                     </p>
-                    <h3 className="mt-1 font-bold text-slate-900">
+                    <h3 className="mt-1 font-bold text-slate-900 dark:text-white">
                       {section.title}
                     </h3>
 
@@ -446,16 +446,16 @@ function CourseBuilder() {
                         {section.lectures.map((lecture, lectureIndex) => (
                           <li
                             key={lecture._id}
-                            className="flex items-start gap-3 rounded-md bg-white px-3 py-3 text-sm text-slate-700"
+                            className="flex items-start gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-3 text-sm text-slate-700 dark:text-gray-300"
                           >
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-700 text-xs font-bold text-white">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-700 dark:bg-cyan-600 text-xs font-bold text-white">
                               {lectureIndex + 1}
                             </span>
                             <span className="min-w-0">
                               <span className="block font-semibold">
                                 {lecture.title}
                               </span>
-                              <span className="mt-1 block truncate text-xs text-slate-400">
+                              <span className="mt-1 block truncate text-xs text-slate-400 dark:text-gray-500">
                                 {isYouTubeUrl(lecture.videoUrl)
                                   ? "YouTube"
                                   : "MP4"}{" "}
@@ -466,7 +466,7 @@ function CourseBuilder() {
                         ))}
                       </ul>
                     ) : (
-                      <p className="mt-3 rounded-md bg-white px-3 py-3 text-sm text-slate-500">
+                      <p className="mt-3 rounded-md bg-white dark:bg-gray-800 px-3 py-3 text-sm text-slate-500 dark:text-gray-400">
                         No lectures in this section yet.
                       </p>
                     )}

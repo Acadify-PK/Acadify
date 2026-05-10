@@ -69,35 +69,35 @@ export default function IntegrationsSettings() {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center p-12 bg-white rounded-3xl border border-gray-100 shadow-sm mt-6">
-      <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
-      <p className="text-gray-500 font-medium">Loading your integrations...</p>
+    <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm mt-6 transition-colors">
+      <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-spin mb-4" />
+      <p className="text-gray-500 dark:text-gray-400 font-medium">Loading your integrations...</p>
     </div>
   );
 
   return (
-    <div className="max-w-3xl bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-3xl bg-white dark:bg-gray-900 p-8 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 flex items-center gap-3">
-            <Globe className="w-7 h-7 text-blue-600" />
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3">
+            <Globe className="w-7 h-7 text-blue-600 dark:text-blue-500" />
             External Integrations
           </h2>
-          <p className="text-gray-500 mt-2 text-sm leading-relaxed max-w-md">
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed max-w-md">
             Bridge your learning experience with your favorite tools. 
             Get instant updates on Slack, Discord, or stay organized with Google Calendar.
           </p>
         </div>
-        <div className="bg-blue-50 p-3 rounded-2xl">
-          <Bell className="w-6 h-6 text-blue-600" />
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-2xl transition-colors">
+          <Bell className="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
       </div>
 
       {message.text && (
         <div className={`flex items-center gap-3 p-4 mb-8 rounded-2xl border ${
           message.type === "success" 
-            ? "bg-green-50 border-green-100 text-green-700" 
-            : "bg-red-50 border-red-100 text-red-700"
+            ? "bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-900/40 text-green-700 dark:text-green-400" 
+            : "bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/40 text-red-700 dark:text-red-400"
         } animate-in zoom-in-95 duration-300`}>
           {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
           <p className="text-sm font-bold">{message.text}</p>
@@ -106,15 +106,15 @@ export default function IntegrationsSettings() {
 
       <form onSubmit={handleSave} className="space-y-8">
         {/* Slack Section */}
-        <div className="group bg-gray-50/50 p-6 rounded-[1.5rem] border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-300">
+        <div className="group bg-gray-50/50 dark:bg-gray-800/50 p-6 rounded-[1.5rem] border border-transparent hover:border-blue-100 dark:hover:border-blue-900 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100">
+              <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-xl shadow-sm flex items-center justify-center border border-gray-100 dark:border-gray-600 transition-colors">
                 <Hash className="w-5 h-5 text-[#E01E5A]" />
               </div>
               <div>
-                <label className="text-base font-bold text-gray-800">Slack Notifications</label>
-                <p className="text-xs text-gray-500">Post updates to a Slack channel</p>
+                <label className="text-base font-bold text-gray-800 dark:text-gray-200">Slack Notifications</label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Post updates to a Slack channel</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -124,14 +124,14 @@ export default function IntegrationsSettings() {
                 checked={integrations.slackEnabled}
                 onChange={(e) => setIntegrations({ ...integrations, slackEnabled: e.target.checked })}
               />
-              <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-12 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
             </label>
           </div>
           
           <div className={`flex items-center gap-3 transition-all duration-300 ${integrations.slackEnabled ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none -translate-y-1'}`}>
             <input
               type="url"
-              className="flex-grow bg-white border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="flex-grow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
               placeholder="https://hooks.slack.com/services/..."
               value={integrations.slackWebhook}
               onChange={(e) => setIntegrations({ ...integrations, slackWebhook: e.target.value })}
@@ -140,7 +140,7 @@ export default function IntegrationsSettings() {
               type="button"
               onClick={() => handleTest("slack")}
               disabled={!integrations.slackWebhook || testing.slack}
-              className="px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {testing.slack ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               Test
@@ -149,15 +149,15 @@ export default function IntegrationsSettings() {
         </div>
 
         {/* Discord Section */}
-        <div className="group bg-gray-50/50 p-6 rounded-[1.5rem] border border-transparent hover:border-blue-100 hover:bg-white transition-all duration-300">
+        <div className="group bg-gray-50/50 dark:bg-gray-800/50 p-6 rounded-[1.5rem] border border-transparent hover:border-blue-100 dark:hover:border-blue-900 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100">
+              <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-xl shadow-sm flex items-center justify-center border border-gray-100 dark:border-gray-600 transition-colors">
                 <MessageSquare className="w-5 h-5 text-[#5865F2]" />
               </div>
               <div>
-                <label className="text-base font-bold text-gray-800">Discord Webhooks</label>
-                <p className="text-xs text-gray-500">Send alerts to your Discord server</p>
+                <label className="text-base font-bold text-gray-800 dark:text-gray-200">Discord Webhooks</label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Send alerts to your Discord server</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -167,14 +167,14 @@ export default function IntegrationsSettings() {
                 checked={integrations.discordEnabled}
                 onChange={(e) => setIntegrations({ ...integrations, discordEnabled: e.target.checked })}
               />
-              <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-12 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
             </label>
           </div>
           
           <div className={`flex items-center gap-3 transition-all duration-300 ${integrations.discordEnabled ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none -translate-y-1'}`}>
             <input
               type="url"
-              className="flex-grow bg-white border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="flex-grow bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
               placeholder="https://discord.com/api/webhooks/..."
               value={integrations.discordWebhook}
               onChange={(e) => setIntegrations({ ...integrations, discordWebhook: e.target.value })}
@@ -183,7 +183,7 @@ export default function IntegrationsSettings() {
               type="button"
               onClick={() => handleTest("discord")}
               disabled={!integrations.discordWebhook || testing.discord}
-              className="px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {testing.discord ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               Test
@@ -192,7 +192,7 @@ export default function IntegrationsSettings() {
         </div>
 
         {/* Google Calendar Section */}
-        <div className="p-6 rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-200">
+        <div className="p-6 rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-200 dark:shadow-none transition-all">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
@@ -221,11 +221,11 @@ export default function IntegrationsSettings() {
           </div>
         </div>
 
-        <div className="pt-4 flex items-center justify-end border-t border-gray-100 gap-4">
+        <div className="pt-4 flex items-center justify-end border-t border-gray-100 dark:border-gray-800 gap-4 transition-colors">
           <button
             type="submit"
             disabled={saving}
-            className="group relative bg-gray-900 overflow-hidden text-white px-8 py-4 rounded-2xl font-black text-sm tracking-wide disabled:opacity-50 transition-all hover:pr-12 active:scale-95 shadow-xl shadow-black/10"
+            className="group relative bg-gray-900 dark:bg-gray-800 overflow-hidden text-white px-8 py-4 rounded-2xl font-black text-sm tracking-wide disabled:opacity-50 transition-all hover:pr-12 active:scale-95 shadow-xl shadow-black/10 dark:shadow-none"
           >
             <span className="relative z-10">{saving ? "PROCESSING..." : "SAVE PREFERENCES"}</span>
             {!saving && <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />}

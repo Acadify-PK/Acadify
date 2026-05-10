@@ -41,10 +41,10 @@ function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
       <div className="flex min-h-screen flex-col lg:flex-row">
         {/* Visual Side */}
-        <section className="relative hidden w-full flex-col justify-between bg-slate-900 p-12 text-white lg:flex lg:w-1/2">
+        <section className="relative hidden w-full flex-col justify-between bg-slate-900 dark:bg-black p-12 text-white lg:flex lg:w-1/2">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop')] opacity-10 blur-sm grayscale" />
           <div className="relative z-10">
             <Link to="/" className="text-2xl font-black tracking-tighter text-cyan-500">
@@ -76,23 +76,23 @@ function Login() {
         </section>
 
         {/* Form Side */}
-        <section className="flex flex-1 flex-col items-center justify-center bg-slate-50 px-6 py-12 sm:px-12 lg:bg-white lg:py-24">
+        <section className="flex flex-1 flex-col items-center justify-center bg-slate-50 dark:bg-gray-900 px-6 py-12 sm:px-12 lg:bg-white lg:dark:bg-gray-950 lg:py-24 transition-colors">
           <div className="w-full max-w-sm">
             <div className="mb-10 lg:hidden">
-              <Link to="/" className="text-2xl font-black tracking-tighter text-cyan-600">
+              <Link to="/" className="text-2xl font-black tracking-tighter text-cyan-600 dark:text-cyan-500">
                 ACADIFY
               </Link>
             </div>
 
-            <h1 className="text-3xl font-black text-slate-900">Welcome Back</h1>
-            <p className="mt-2 text-slate-500">Enter your credentials to access your account</p>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white">Welcome Back</h1>
+            <p className="mt-2 text-slate-500 dark:text-gray-400">Enter your credentials to access your account</p>
 
             {error && (
               <div
                 role="alert"
                 aria-live="assertive"
                 aria-atomic="true"
-                className="mt-8 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-700"
+                className="mt-8 rounded-2xl border border-rose-100 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 p-4 text-sm font-bold text-rose-700 dark:text-rose-400"
               >
                 {error}
               </div>
@@ -100,7 +100,7 @@ function Login() {
 
             <form onSubmit={handleSubmit} className="mt-10 space-y-6">
               <div className="space-y-2">
-                <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-slate-500">Email Address</label>
+                <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Email Address</label>
                 <input
                   id="email"
                   type="email"
@@ -109,14 +109,14 @@ function Login() {
                   placeholder="name@company.com"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:focus:bg-white"
+                  className="w-full rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:dark:bg-gray-900/50 lg:focus:bg-white dark:text-white"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-slate-500">Password</label>
-                  <Link to="/forgot-password" className="text-xs font-bold text-cyan-600 hover:text-cyan-700">Forgot?</Link>
+                  <label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
+                  <Link to="/forgot-password" className="text-xs font-bold text-cyan-600 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400">Forgot?</Link>
                 </div>
                 <input
                   id="password"
@@ -126,7 +126,7 @@ function Login() {
                   placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:focus:bg-white"
+                  className="w-full rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:dark:bg-gray-900/50 lg:focus:bg-white dark:text-white"
                 />
               </div>
 
@@ -139,9 +139,9 @@ function Login() {
               </button>
             </form>
 
-            <p className="mt-10 text-center text-sm text-slate-500">
+            <p className="mt-10 text-center text-sm text-slate-500 dark:text-gray-400">
               New here?{" "}
-              <Link to="/register" className="font-black text-cyan-600 hover:text-cyan-700">
+              <Link to="/register" className="font-black text-cyan-600 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400">
                 Create an account
               </Link>
             </p>
