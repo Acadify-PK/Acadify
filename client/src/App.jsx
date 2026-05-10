@@ -10,11 +10,14 @@ import StudentDashboard from "./pages/StudentDashboard";
 import InstructorAnalytics from "./pages/InstructorAnalytics";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminModerationLogs from "./pages/AdminModerationLogs";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
       <Route
         path="/courses/:id"
         element={
@@ -68,6 +71,7 @@ function App() {
         }
       />
     </Routes>
+    </>
   );
 }
 

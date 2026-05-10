@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
-import { useAuth } from "../context/AuthContext";
-import NotificationsDropdown from "../components/NotificationsDropdown";
-
 function Home() {
-  const { user, logout } = useAuth();
-
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -112,60 +107,6 @@ function Home() {
               Select a course to view its curriculum and start learning.
             </p>
           </div>
-
-          {user ? (
-            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
-              <NotificationsDropdown />
-              <div className="h-8 w-px bg-slate-200 mx-1"></div>
-              <Link
-                to="/dashboard"
-                className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
-              >
-                My Learning
-              </Link>
-              {(user.role === "instructor" || user.role === "admin") && (
-                <Link
-                  to="/instructor"
-                  className="rounded-md border border-cyan-200 bg-cyan-50 px-3 py-2 text-sm font-bold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
-                >
-                  Dashboard
-                </Link>
-              )}
-              {(user.role === "instructor" || user.role === "admin") && (
-                <Link
-                  to="/instructor/analytics"
-                  className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-bold text-amber-700 transition hover:border-amber-300 hover:bg-amber-100"
-                >
-                  Analytics
-                </Link>
-              )}
-              <span className="max-w-40 truncate text-sm font-semibold text-slate-700">
-                {user.name}
-              </span>
-              <button
-                type="button"
-                onClick={logout}
-                className="rounded-md bg-rose-600 px-3 py-2 text-sm font-bold text-white transition hover:bg-rose-700"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                to="/login"
-                className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:text-cyan-700"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="rounded-md bg-cyan-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800"
-              >
-                Register
-              </Link>
-            </div>
-          )}
         </div>
 
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

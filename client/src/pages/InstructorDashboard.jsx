@@ -50,14 +50,7 @@ function InstructorDashboard() {
     <main className="min-h-screen bg-[#f7f8fb] text-slate-950">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
-          <Link
-            to="/"
-            className="inline-flex text-sm font-semibold text-cyan-700 hover:text-cyan-800"
-          >
-            Back to courses
-          </Link>
-
-          <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
                 Instructor Dashboard
@@ -69,13 +62,6 @@ function InstructorDashboard() {
                 Create the course shell first. After it is saved, you will move
                 into the builder to add sections and lectures.
               </p>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-sm font-semibold text-slate-500">
-                Signed in as
-              </p>
-              <p className="mt-1 font-bold text-slate-950">{user?.name}</p>
             </div>
           </div>
         </div>

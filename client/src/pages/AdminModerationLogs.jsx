@@ -112,7 +112,6 @@ export default function AdminModerationLogs() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Moderation Audit Logs</h1>
-          <div className="text-sm text-slate-600">Signed in as {user?.name} ({user?.role})</div>
         </div>
 
         <div className="mb-4 grid gap-3 sm:grid-cols-4">
