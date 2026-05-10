@@ -16,6 +16,7 @@ import commentRoutes from "./routes/comment.routes.js";
 import moderationRoutes from "./routes/moderation.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import integrationRoutes from "./routes/integration.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+app.use("/api/stats", statsRoutes);
 app.use("/api/courses", courseRoutes)
 app.use("/api/sections", sectionRoutes);
 app.use("/api/lectures", lectureRoutes);
