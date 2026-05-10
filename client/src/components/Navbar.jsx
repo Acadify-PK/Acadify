@@ -6,7 +6,6 @@ import {
   LogOut, 
   LayoutDashboard, 
   Search, 
-  GraduationCap, 
   ShieldCheck, 
   BarChart3,
   Menu,
@@ -27,7 +26,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Browse", path: "/", icon: Search, roles: ["student", "instructor", "admin"] },
-    { name: "My Learning", path: "/dashboard", icon: GraduationCap, roles: ["student", "instructor", "admin"] },
+    { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student", "instructor", "admin"] },
     { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor", "admin"] },
     { name: "Moderation", path: "/admin/moderation", icon: ShieldCheck, roles: ["admin"] },
   ];
@@ -41,9 +40,11 @@ export default function Navbar() {
           {/* Logo Section */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 shadow-lg shadow-blue-500/20">
-                <GraduationCap className="text-white w-6 h-6" />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Acadify Logo" 
+                className="w-10 h-10 object-contain transition-transform group-hover:rotate-6 shadow-lg shadow-blue-500/10 rounded-xl"
+              />
               <span className="text-2xl font-black text-gray-900 tracking-tighter transition-colors group-hover:text-blue-600">
                 Acadify
               </span>

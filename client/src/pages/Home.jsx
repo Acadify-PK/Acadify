@@ -68,10 +68,13 @@ function Home() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-8 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:py-10">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
-              Acadify
-            </p>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/logo.png" alt="Acadify" className="w-8 h-8 object-contain" />
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
+                Acadify
+              </p>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
               Learn from structured courses built for steady progress.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
