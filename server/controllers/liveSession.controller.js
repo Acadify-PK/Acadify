@@ -1,10 +1,11 @@
 import LiveSession from "../models/LiveSession.js";
 import Course from "../models/Course.js";
+import Enrollment from "../models/Enrollment.js";
 
 export const startLiveSession = async (req, res) => {
     try {
         const { courseId, title, roomName } = req.body;
-        const instructorId = req.user.id;
+        const instructorId = req.user._id; // Updated from .id to ._id for consistency
 
         // Check if instructor owns the course
         const course = await Course.findOne({ _id: courseId, instructor: instructorId });
@@ -35,7 +36,7 @@ export const startLiveSession = async (req, res) => {
 export const endLiveSession = async (req, res) => {
     try {
         const { sessionId } = req.params;
-        const instructorId = req.user.id;
+        const instructorId = req.user._id; // Updated from .id to ._id for consistency
 
         const session = await LiveSession.findOneAndUpdate(
             { _id: sessionId, instructor: instructorId, status: 'live' },
@@ -56,8 +57,25 @@ export const endLiveSession = async (req, res) => {
 export const getLiveSession = async (req, res) => {
     try {
         const { courseId } = req.params;
+        const userId = req.user._id;
+
+        // Security: Check if user is the instructor OR an enrolled student
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        const isInstructor = course.instructor.toString() === userId.toString();
+        const isAdmin = req.user.role === 'admin';
+        
+        const enrollment = await Enrollment.findOne({ user: userId, course: courseId });
+
+        if (!isInstructor && !isAdmin && !enrollment) {
+            return res.status(403).json({ message: "You must be enrolled to see live session details" });
+        }
+
         const session = await LiveSession.findOne({ course: courseId, status: 'live' })
-            .populate('instructor', 'name avatar');
+            .populate('instructor', 'name');
         
         res.json(session || null);
     } catch (error) {
