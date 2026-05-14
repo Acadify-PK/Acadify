@@ -143,6 +143,16 @@ export const getAllCourses = async (req, res) => {
     }
 };
 
+export const getInstructorCourses = async (req, res) => {
+    try {
+        const courses = await Course.find({ instructor: req.user._id })
+            .sort({ createdAt: -1 });
+        res.json(courses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const publishCourse = async (req, res) => {
     try {
         const course = await Course.findById(req.params.id);

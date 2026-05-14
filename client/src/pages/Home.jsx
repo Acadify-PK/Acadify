@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 import { Filter, ChevronDown, ChevronUp, Search as SearchIcon, X } from "lucide-react";
 
 function Home() {
+  const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -34,7 +36,14 @@ function Home() {
       })
       .then((res) => {
         if (!ignore) {
-          setCourses(res.data.data || []);
+          // If user is instructor, filter out their own courses
+          let fetchedCourses = res.data.data || [];
+          if (user && user.role === "instructor") {
+            fetchedCourses = fetchedCourses.filter(
+              (course) => String(course.instructor?._id || course.instructor) !== String(user._id)
+            );
+          }
+          setCourses(fetchedCourses);
           setTotalPages(res.data.totalPages || 1);
           setTotalCourses(res.data.total || 0);
           setError("");

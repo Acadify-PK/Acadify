@@ -6,15 +6,28 @@ import { BookOpen, Zap, CheckCircle, TrendingUp, ChevronRight, Layout, Settings 
 
 function StudentDashboard() {
   const [courses, setCourses] = useState([]);
+  const [liveSessions, setLiveSessions] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("courses");
-  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get("/enrollments/me")
-      .then(res => {
-        setCourses(res.data);
+      .then(async res => {
+        const enrolledCourses = res.data;
+        setCourses(enrolledCourses);
         setLoading(false);
+
+        // Fetch live sessions for all enrolled courses
+        for (const course of enrolledCourses) {
+          try {
+            const liveRes = await axios.get(`/live-sessions/course/${course._id}`);
+            if (liveRes.data) {
+              setLiveSessions(prev => ({ ...prev, [course._id]: liveRes.data }));
+            }
+          } catch (err) {
+            console.error("Error fetching live session for dashboard", err);
+          }
+        }
       })
       .catch(err => {
         console.error(err);
@@ -104,10 +117,16 @@ function StudentDashboard() {
                      alt={course.title} 
                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${course.progressPercent === 100 ? 'bg-green-500 text-white' : 'bg-blue-600 text-white'}`}>
                       {course.progressPercent === 100 ? 'Completed' : 'In Progress'}
                     </span>
+                    {liveSessions[course._id] && (
+                      <span className="bg-rose-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                        Live Now
+                      </span>
+                    )}
                   </div>
                 </div>
               ) : (

@@ -17,6 +17,7 @@ import moderationRoutes from "./routes/moderation.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import integrationRoutes from "./routes/integration.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
+import liveSessionRoutes from "./routes/liveSession.routes.js";
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/integrations", integrationRoutes);
+app.use("/api/live-sessions", liveSessionRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });

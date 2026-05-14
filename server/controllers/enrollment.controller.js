@@ -55,6 +55,13 @@ export const enrollCourse = async (req, res) => {
         const userId = req.user._id;
         const { courseId } = req.body;
 
+        // Restriction: Instructors/Admins cannot enroll as students
+        if (req.user.role === "instructor" || req.user.role === "admin") {
+            return res.status(403).json({
+                message: "Instructors and Admins cannot enroll in courses as students.",
+            });
+        }
+
         const course = await Course.findById(courseId);
 
         if (!course) {

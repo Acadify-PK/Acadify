@@ -9,6 +9,7 @@ import {
   Search, 
   ShieldCheck, 
   BarChart3,
+  Video,
   Menu,
   X,
   Moon,
@@ -30,8 +31,9 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Browse", path: "/lms", icon: Search, roles: ["student", "instructor", "admin"] },
-    { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student", "instructor", "admin"] },
+    { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student"] },
     { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor", "admin"] },
+    { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor", "admin"] },
     { name: "Moderation", path: "/admin/moderation", icon: ShieldCheck, roles: ["admin"] },
   ];
 

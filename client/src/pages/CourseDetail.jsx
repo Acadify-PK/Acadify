@@ -48,6 +48,7 @@ function CourseDetail() {
   const { user } = useAuth();
 
   const [course, setCourse] = useState(null);
+  const [activeLiveSession, setActiveLiveSession] = useState(null);
   const [activeLecture, setActiveLecture] = useState(null);
   const [enrolled, setEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,13 @@ function CourseDetail() {
 
   useEffect(() => {
     let ignore = false;
+
+    axios
+      .get(`/live-sessions/course/${id}`)
+      .then((res) => {
+        if (!ignore) setActiveLiveSession(res.data);
+      })
+      .catch((err) => console.error(err));
 
     axios
       .get(`/courses/full/${id}`)
@@ -367,6 +375,27 @@ function CourseDetail() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 text-slate-950 dark:text-gray-100 transition-colors">
+      {/* Live Session Alert Header */}
+      {enrolled && activeLiveSession && (
+        <div className="bg-cyan-600 px-5 py-3 text-white">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-200 opacity-75"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-white"></span>
+              </span>
+              <p className="text-sm font-bold">A live session is currently active for this course!</p>
+            </div>
+            <button
+              onClick={() => window.open(`https://meet.jit.si/${activeLiveSession.roomName}`, "_blank")}
+              className="rounded-full bg-white px-4 py-1.5 text-xs font-bold text-cyan-600 transition hover:bg-cyan-50"
+            >
+              Join Now
+            </button>
+          </div>
+        </div>
+      )}
+
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
         <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
