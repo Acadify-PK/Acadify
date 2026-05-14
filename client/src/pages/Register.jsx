@@ -27,8 +27,18 @@ function Register() {
       setSubmitting(true);
       setError("");
       const res = await axios.post("/auth/register", form);
-      setUser(res.data);
-      navigate("/");
+      const user = res.data;
+      setUser(user);
+      
+      // Since it's a new registration, it's usually a student by default
+      // but if the system supports instructor registration, we handle it here
+      if (user.role === "admin") {
+        navigate("/admin/moderation");
+      } else if (user.role === "instructor") {
+        navigate("/instructor");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ||

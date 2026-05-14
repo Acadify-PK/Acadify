@@ -26,8 +26,17 @@ function Login() {
       setSubmitting(true);
       setError("");
       const res = await axios.post("/auth/login", form);
-      setUser(res.data);
-      navigate("/");
+      const user = res.data;
+      setUser(user);
+      
+      // Role-based redirection
+      if (user.role === "admin") {
+        navigate("/admin/moderation");
+      } else if (user.role === "instructor") {
+        navigate("/instructor");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ||
