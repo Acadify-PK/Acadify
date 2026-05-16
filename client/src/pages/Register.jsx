@@ -56,134 +56,124 @@ function Register() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f8fb] dark:bg-gray-950 text-slate-950 dark:text-white">
-      <section className="mx-auto grid min-h-screen max-w-7xl px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_480px] lg:gap-12">
-        <div className="hidden flex-col justify-between py-10 lg:flex">
-          <Link
-            to="/"
-            className="w-fit text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-500"
-          >
-            Acadify
-          </Link>
+    <main className="min-h-screen bg-white dark:bg-gray-950 transition-colors">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        {/* Visual Side */}
+        <section className="relative hidden w-full flex-col justify-between bg-slate-900 dark:bg-black p-12 text-white lg:flex lg:w-1/2">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2070&auto=format&fit=crop')] opacity-10 blur-sm grayscale" />
+          <div className="relative z-10">
+            <Link to="/" className="text-2xl font-black tracking-tighter text-cyan-500">
+              ACADIFY
+            </Link>
+          </div>
 
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500">
-              Start Learning
-            </p>
-            <h1 className="mt-3 text-5xl font-bold tracking-tight">
-              Create your account and unlock a cleaner course workspace.
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-gray-400">
-              Join Acadify to enroll in courses, move through lectures, and
-              keep your learning path organized from the first lesson.
+          <div className="relative z-10 max-w-lg">
+            <h2 className="text-5xl font-black leading-tight sm:text-6xl">
+              Your Journey <br />
+              <span className="text-cyan-500">Starts Here.</span>
+            </h2>
+            <p className="mt-8 text-xl text-slate-400">
+              Join Acadify to unlock premium courses, track your progress, and master new skills with industry experts.
             </p>
           </div>
 
-          <div className="grid max-w-xl grid-cols-3 gap-3">
-            {["Enroll quickly", "Watch lessons", "Track content"].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-800 p-4 text-sm font-semibold text-slate-700 dark:text-gray-300 shadow-sm transition hover:border-cyan-500/50"
-                >
-                  {item}
-                </div>
-              ),
-            )}
+          <div className="relative z-10 flex items-center gap-4 border-t border-white/10 pt-8">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold">Comprehensive Curriculum</p>
+              <p className="text-xs text-slate-500">Structured paths for every skill level</p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="flex items-center justify-center">
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-md rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm sm:p-8"
-          >
-            <div className="mb-8">
-              <Link
-                to="/"
-                className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700 lg:hidden"
-              >
-                Acadify
+        {/* Form Side */}
+        <section className="flex flex-1 flex-col items-center justify-center bg-slate-50 dark:bg-gray-900 px-6 py-12 sm:px-12 lg:bg-white lg:dark:bg-gray-950 lg:py-24 transition-colors">
+          <div className="w-full max-w-sm">
+            <div className="mb-10 lg:hidden">
+              <Link to="/" className="text-2xl font-black tracking-tighter text-cyan-600 dark:text-cyan-500">
+                ACADIFY
               </Link>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
-                Create account
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-gray-400">
-                Set up your learner profile and start browsing courses.
-              </p>
             </div>
 
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white">Create Account</h1>
+            <p className="mt-2 text-slate-500 dark:text-gray-400">Join our community of over 10,000+ students</p>
+
             {error && (
-              <div className="mb-5 rounded-md border border-rose-200 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 px-4 py-3 text-sm font-medium text-rose-700 dark:text-rose-400">
+              <div
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                className="mt-8 rounded-2xl border border-rose-100 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 p-4 text-sm font-bold text-rose-700 dark:text-rose-400"
+              >
                 {error}
               </div>
             )}
 
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
-                Full name
-              </span>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                placeholder="Your name"
-                onChange={handleChange}
-                required
-                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20"
-              />
-            </label>
+            <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Full Name</label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="John Doe"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:dark:bg-gray-900/50 lg:focus:bg-white dark:text-white"
+                />
+              </div>
 
-            <label className="mt-4 block">
-              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
-                Email
-              </span>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                placeholder="you@example.com"
-                onChange={handleChange}
-                required
-                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20"
-              />
-            </label>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Email Address</label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="name@company.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:dark:bg-gray-900/50 lg:focus:bg-white dark:text-white"
+                />
+              </div>
 
-            <label className="mt-4 block">
-              <span className="text-sm font-semibold text-slate-700 dark:text-gray-300">
-                Password
-              </span>
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                placeholder="Create a password"
-                onChange={handleChange}
-                required
-                className="mt-2 w-full rounded-md border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none transition placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-cyan-500 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-cyan-100 dark:focus:ring-cyan-900/20"
-              />
-            </label>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 py-4 text-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/5 lg:bg-slate-50 lg:dark:bg-gray-900/50 lg:focus:bg-white dark:text-white"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-cyan-700 dark:bg-cyan-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800 dark:hover:bg-cyan-700 disabled:cursor-wait disabled:opacity-70"
-            >
-              {submitting ? "Creating account..." : "Create account"}
-            </button>
-
-            <p className="mt-5 text-center text-sm text-slate-500 dark:text-gray-400">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="font-bold text-cyan-700 dark:text-cyan-500 hover:text-cyan-800 dark:hover:text-cyan-400"
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-2xl bg-cyan-600 py-5 text-sm font-black text-white shadow-lg shadow-cyan-900/20 transition hover:bg-cyan-500 active:scale-95 disabled:opacity-50"
               >
+                {submitting ? "Creating account..." : "Sign Up"}
+              </button>
+            </form>
+
+            <p className="mt-10 text-center text-sm text-slate-500 dark:text-gray-400">
+              Already have an account?{" "}
+              <Link to="/login" className="font-black text-cyan-600 dark:text-cyan-500 hover:text-cyan-700 dark:hover:text-cyan-400">
                 Sign in
               </Link>
             </p>
-          </form>
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
