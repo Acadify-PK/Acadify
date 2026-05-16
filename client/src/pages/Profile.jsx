@@ -2,7 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-import { User, Mail, Globe, Camera, Check, Shield, ShieldOff, Copy, ExternalLink, Phone } from "lucide-react";
+import { User, Mail, Globe, Camera, Check, Shield, ShieldOff, Copy, ExternalLink, Phone, Image as ImageIcon } from "lucide-react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 
 export default function Profile() {
@@ -17,6 +17,7 @@ export default function Profile() {
     website: user?.website || "",
     phone: user?.phone || "",
     avatar: user?.avatar || "",
+    banner: user?.banner || "",
     isPublic: user?.isPublic ?? true,
     socialLinks: {
       twitter: user?.socialLinks?.twitter || "",
@@ -127,15 +128,37 @@ export default function Profile() {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Avatar URL</label>
-                  <input
-                    name="avatar"
-                    value={form.avatar}
-                    onChange={handleChange}
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
-                  />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Avatar URL</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400">
+                        <Camera size={16} />
+                      </div>
+                      <input
+                        name="avatar"
+                        value={form.avatar}
+                        onChange={handleChange}
+                        placeholder="https://example.com/photo.jpg"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 pl-12 pr-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Banner URL</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400">
+                        <ImageIcon size={16} />
+                      </div>
+                      <input
+                        name="banner"
+                        value={form.banner}
+                        onChange={handleChange}
+                        placeholder="https://example.com/banner.jpg"
+                        className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 pl-12 pr-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

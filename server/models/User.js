@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
         default: "student",
     },
     avatar: { type: String, default: "" },
+    banner: { type: String, default: "" },
     bio: { type: String, default: "" },
     headline: { type: String, default: "" },
     website: { type: String, default: "" },

@@ -52,7 +52,14 @@ export default function PublicProfile() {
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors">
       {/* Cover/Header Space */}
-      <div className="h-48 w-full bg-gradient-to-r from-cyan-600 to-blue-700" />
+      <div className="h-64 w-full relative overflow-hidden">
+        {profile.banner ? (
+          <img src={profile.banner} alt="banner" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-r from-cyan-600 to-blue-700" />
+        )}
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
       
       <div className="max-w-4xl mx-auto px-6 lg:px-0 -mt-24">
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-white/5 overflow-hidden">

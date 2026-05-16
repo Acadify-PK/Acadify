@@ -81,6 +81,7 @@ export const me = (req, res) => {
         email: req.user.email,
         role: req.user.role,
         avatar: req.user.avatar,
+        banner: req.user.banner,
         phone: req.user.phone,
         bio: req.user.bio,
         headline: req.user.headline,
@@ -94,7 +95,7 @@ export const me = (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        const { name, avatar, bio, headline, website, socialLinks, isPublic, phone } = req.body;
+        const { name, avatar, banner, bio, headline, website, socialLinks, isPublic, phone } = req.body;
         const user = await User.findById(req.user._id);
 
         if (name) user.name = name.trim();
@@ -107,6 +108,15 @@ export const updateProfile = async (req, res) => {
                 user.avatar = "";
             } else if (avatar.startsWith('https://') || avatar.startsWith('http://') || avatar.startsWith('data:image/')) {
                 user.avatar = avatar;
+            }
+        }
+
+        // Basic sanitization for Banner URL
+        if (banner !== undefined) {
+            if (banner === "") {
+                user.banner = "";
+            } else if (banner.startsWith('https://') || banner.startsWith('http://') || banner.startsWith('data:image/')) {
+                user.banner = banner;
             }
         }
 
@@ -134,6 +144,7 @@ export const updateProfile = async (req, res) => {
             email: user.email,
             role: user.role,
             avatar: user.avatar,
+            banner: user.banner,
             phone: user.phone,
             bio: user.bio,
             headline: user.headline,
