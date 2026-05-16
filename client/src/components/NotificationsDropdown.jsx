@@ -22,7 +22,9 @@ export default function NotificationsDropdown() {
     try {
       setLoading(true);
       const res = await axios.get("/notifications");
-      setNotifications(res.data);
+      // Handle both old array structure and new paginated object structure
+      const data = res.data.notifications || res.data;
+      setNotifications(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       console.error("Failed to fetch notifications", err);
@@ -115,10 +117,17 @@ export default function NotificationsDropdown() {
                 {notifications.map((n) => (
                   <div
                     key={n._id}
-                    className={`relative p-4 transition hover:bg-slate-50 dark:hover:bg-gray-700/50 ${!n.isRead ? 'bg-cyan-50/30 dark:bg-cyan-900/10' : ''}`}
+                    className={`relative p-4 transition hover:bg-slate-50 dark:hover:bg-gray-700/50 ${!n.isRead ? 'bg-cyan-50/30 dark:bg-cyan-900/10' : ''} ${n.priority === 'high' ? 'border-l-2 border-rose-500' : ''}`}
                   >
                     <div className="flex gap-3">
                       <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          {n.priority === 'high' && (
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400 rounded">
+                              High Priority
+                            </span>
+                          )}
+                        </div>
                         <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-gray-400'}`}>
                           {n.message}
                         </p>

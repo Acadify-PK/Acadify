@@ -13,8 +13,26 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["new_comment", "comment_moderated", "user_status_update", "course_published"],
+    enum: [
+      "new_comment", 
+      "comment_moderated", 
+      "user_status_update", 
+      "course_published",
+      "enrollment_success",
+      "new_lecture",
+      "live_session_started",
+      "achievement_unlocked",
+      "system_alert"
+    ],
     required: true,
+  },
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high", "urgent"],
+    default: "medium",
+  },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed, // For storing extra IDs like courseId, achievementId etc.
   },
   message: {
     type: String,

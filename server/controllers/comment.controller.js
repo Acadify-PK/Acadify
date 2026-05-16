@@ -1,8 +1,7 @@
 import Comment from "../models/Comment.js";
 import Course from "../models/Course.js";
 import ModerationLog from "../models/ModerationLog.js";
-import Notification from "../models/Notification.js";
-import { pushExternalNotification } from "../services/notification.service.js";
+import { createNotification } from "../services/notification.service.js";
 import mongoose from "mongoose";
 
 export const addComment = async (req, res) => {
@@ -31,14 +30,15 @@ export const addComment = async (req, res) => {
     // Course instructor notification
     const courseObj = await Course.findById(courseId).select("instructor title");
     if (courseObj && String(courseObj.instructor) !== String(userId)) {
-      await Notification.create({
+      await createNotification({
         recipient: courseObj.instructor,
         sender: userId,
         type: "new_comment",
         message: `${req.user.name} recently commented on your course "${courseObj.title}"`,
         link: `/course/${courseId}`,
+        priority: "medium",
+        metadata: { courseId, commentId: comment._id }
       });
-      pushExternalNotification(courseObj.instructor, `New comment on your course "${courseObj.title}": ${content.slice(0, 50)}...`);
     }
 
     res.status(201).json(populated);

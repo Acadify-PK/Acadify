@@ -1,5 +1,27 @@
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 import axios from "axios";
+
+export const createNotification = async ({ recipient, sender, type, message, link, priority = "medium", metadata = {} }) => {
+  try {
+    const notification = await Notification.create({
+      recipient,
+      sender,
+      type,
+      message,
+      link,
+      priority,
+      metadata,
+    });
+
+    // Also push to external integrations if applicable
+    await pushExternalNotification(recipient, message);
+
+    return notification;
+  } catch (error) {
+    console.error("Internal notification error", error);
+  }
+};
 
 export const pushExternalNotification = async (recipientId, message) => {
   try {
