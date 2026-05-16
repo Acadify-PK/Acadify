@@ -1,6 +1,7 @@
 import express from 'express';
 import { protect } from '../middleware/auth.middleware.js';
 import { addComment, getComments, deleteComment, moderateComment } from '../controllers/comment.controller.js';
+import { interactionLimiter } from '../middleware/rateLimit.middleware.js';
 
 const router = express.Router();
 
@@ -48,7 +49,7 @@ router.get('/:courseId', getComments);
  *       201:
  *         description: Comment added
  */
-router.post('/', protect, addComment);
+router.post('/', protect, interactionLimiter, addComment);
 
 /**
  * @swagger

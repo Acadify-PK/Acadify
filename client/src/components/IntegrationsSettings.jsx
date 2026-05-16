@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../api/axios";
+import toast from "react-hot-toast";
 import { Bell, Hash, MessageSquare, Calendar, Globe, AlertCircle, CheckCircle2, Loader2, Send, ChevronRight } from "lucide-react";
 
 export default function IntegrationsSettings() {
@@ -12,7 +13,6 @@ export default function IntegrationsSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState({ slack: false, discord: false });
-  const [message, setMessage] = useState({ type: "", text: "" });
 
   useEffect(() => {
     fetchIntegrations();
@@ -33,12 +33,9 @@ export default function IntegrationsSettings() {
     setTesting({ ...testing, [type]: true });
     try {
       await axios.post("/integrations/test", { type });
-      setMessage({ type: "success", text: `Test message sent to ${type} successfully!` });
+      toast.success(`Test message sent to ${type} successfully!`);
     } catch (err) {
-      setMessage({ 
-        type: "error", 
-        text: err.response?.data?.message || `Failed to send test to ${type}.` 
-      });
+      toast.error(err.response?.data?.message || `Failed to send test to ${type}.`);
     } finally {
       setTesting({ ...testing, [type]: false });
     }
@@ -49,20 +46,19 @@ export default function IntegrationsSettings() {
       const { data } = await axios.get("/integrations/google/auth");
       window.open(data.url, "_blank", "width=600,height=600");
     } catch (err) {
-      setMessage({ type: "error", text: "Failed to start Google Auth" });
+      toast.error("Failed to start Google Auth");
     }
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-    setMessage({ type: "", text: "" });
 
     try {
       await axios.put("/integrations", integrations);
-      setMessage({ type: "success", text: "Integrations updated successfully!" });
+      toast.success("Integrations updated successfully!");
     } catch (err) {
-      setMessage({ type: "error", text: "Failed to update integrations." });
+      toast.error("Failed to update integrations.");
     } finally {
       setSaving(false);
     }
@@ -92,17 +88,6 @@ export default function IntegrationsSettings() {
           <Bell className="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
       </div>
-
-      {message.text && (
-        <div className={`flex items-center gap-3 p-4 mb-8 rounded-2xl border ${
-          message.type === "success" 
-            ? "bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-900/40 text-green-700 dark:text-green-400" 
-            : "bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-900/40 text-red-700 dark:text-red-400"
-        } animate-in zoom-in-95 duration-300`}>
-          {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-          <p className="text-sm font-bold">{message.text}</p>
-        </div>
-      )}
 
       <form onSubmit={handleSave} className="space-y-8">
         {/* Slack Section */}

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { globalLimiter } from "./middleware/rateLimit.middleware.js";
 import { setupSwagger } from "./config/swagger.js";
 
 // Routes imports
@@ -30,6 +31,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Apply global rate limiting to all requests
+app.use(globalLimiter);
+
 // Setup Swagger
 setupSwagger(app);
 
@@ -49,6 +53,9 @@ app.use("/api/moderation", moderationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/integrations", integrationRoutes);
 app.use("/api/live-sessions", liveSessionRoutes);
+
+// Swagger Documentation
+setupSwagger(app);
 
 app.get("/api", (req, res) => {
   res.json({ message: "API running..." });

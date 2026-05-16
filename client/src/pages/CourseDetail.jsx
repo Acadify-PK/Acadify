@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import ProgressBar from "../components/ProgressBar";
@@ -218,8 +219,10 @@ function CourseDetail() {
       });
 
       setEnrolled(true);
+      toast.success("Successfully enrolled!");
     } catch (err) {
       console.error(err);
+      toast.error("Failed to enroll.");
     } finally {
       setEnrolling(false);
     }

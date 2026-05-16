@@ -1,4 +1,5 @@
 import { Route, Routes, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import LandingPage from "./pages/LandingPage";
 import CourseDetail from "./pages/CourseDetail";
@@ -22,6 +23,7 @@ function App() {
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       {!shouldHideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<LandingPage />} />

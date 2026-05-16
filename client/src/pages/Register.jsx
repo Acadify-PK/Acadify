@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -39,12 +40,15 @@ function Register() {
       } else {
         navigate("/dashboard");
       }
+      toast.success("Account created successfully!");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Registration failed. Please check your details and try again.",
-      );
+      if (err.response?.status !== 429) {
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Registration failed. Please check your details and try again.",
+        );
+      }
       console.error(err.response?.data || err.message);
     } finally {
       setSubmitting(false);

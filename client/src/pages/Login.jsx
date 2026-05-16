@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -28,7 +29,8 @@ function Login() {
       const res = await axios.post("/auth/login", form);
       const user = res.data;
       setUser(user);
-      
+      toast.success("Welcome back!");
+
       // Role-based redirection
       if (user.role === "admin") {
         navigate("/admin/moderation");
@@ -38,11 +40,13 @@ function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Login failed. Please check your details and try again.",
-      );
+      if (err.response?.status !== 429) {
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Login failed. Please check your details and try again.",
+        );
+      }
       console.error(err.response?.data || err.message);
     } finally {
       setSubmitting(false);

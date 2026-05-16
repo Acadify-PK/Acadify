@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Video, Users, Clock, AlertCircle, ExternalLink, StopCircle, Play, User, Mail, ChevronDown, ChevronUp } from "lucide-react";
 import axios from "../api/axios";
+import toast from "react-hot-toast";
 
 function InstructorLiveManager() {
   const [courses, setCourses] = useState([]);
@@ -60,9 +61,10 @@ function InstructorLiveManager() {
         roomName,
       });
       setLiveSessions((prev) => ({ ...prev, [course._id]: res.data }));
+      toast.success("Live session started successfully!");
       window.open(`https://meet.jit.si/${roomName}`, "_blank");
     } catch (err) {
-      alert(err.response?.data?.message || "Could not start live session");
+      toast.error(err.response?.data?.message || "Could not start live session");
     } finally {
       setActionLoading(null);
     }
@@ -80,8 +82,9 @@ function InstructorLiveManager() {
         delete next[courseId];
         return next;
       });
+      toast.success("Live session ended.");
     } catch (err) {
-      alert("Could not end live session");
+      toast.error("Could not end live session");
     } finally {
       setActionLoading(null);
     }

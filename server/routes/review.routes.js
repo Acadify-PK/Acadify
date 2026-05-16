@@ -4,6 +4,7 @@ import {
     addReview,
     getReviews,
 } from "../controllers/review.controller.js";
+import { interactionLimiter } from "../middleware/rateLimit.middleware.js";
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ const router = express.Router();
  *       201:
  *         description: Review added
  */
-router.post("/", protect, addReview);
+router.post("/", protect, interactionLimiter, addReview);
 
 /**
  * @swagger
