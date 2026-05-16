@@ -16,6 +16,16 @@ const commentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    parentComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null,
+      index: true,
+    },
+    repliesCount: {
+      type: Number,
+      default: 0,
+    },
     // moderation fields
     hidden: {
       type: Boolean,

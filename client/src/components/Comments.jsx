@@ -2,6 +2,195 @@ import { useEffect, useState } from "react";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
+function CommentItem({
+  comment: c,
+  courseId,
+  user,
+  canModerate,
+  onDelete,
+  onModerate,
+  isCourseInstructor,
+  enrolled,
+}) {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [showReplies, setShowReplies] = useState(false);
+  const [loadingReplies, setLoadingReplies] = useState(false);
+
+  const canComment = Boolean(user && (enrolled || user.role === "admin"));
+
+  const toggleReplies = async () => {
+    if (!showReplies && replies.length === 0 && c.repliesCount > 0) {
+      setLoadingReplies(true);
+      try {
+        const res = await axios.get(`/comments/${courseId}`, {
+          params: { parentId: c._id },
+        });
+        setReplies(res.data.data || []);
+      } catch (err) {
+        console.error("Failed to load replies", err);
+      } finally {
+        setLoadingReplies(false);
+      }
+    }
+    setShowReplies(!showReplies);
+  };
+
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+    if (!replyContent.trim()) return;
+
+    try {
+      setIsSubmittingReply(true);
+      const res = await axios.post("/comments", {
+        courseId,
+        content: replyContent.trim(),
+        parentCommentId: c._id,
+      });
+      setReplies((prev) => [res.data, ...prev]);
+      setReplyContent("");
+      setShowReplyForm(false);
+      setShowReplies(true);
+      // Note: We don't update the parent's repliesCount in local state here, 
+      // but the server does it. Re-fetching the parent would be cleaner but complex.
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <article className="rounded-2xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 p-4 transition-colors">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="font-bold text-slate-900 dark:text-white">
+              {c.user?.name || "Learner"}
+            </p>
+            <p className="text-xs text-slate-400">
+              {new Date(c.createdAt).toLocaleString()}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {(String(c.user?._id || c.user) === String(user?._id) ||
+              user?.role === "admin") && (
+              <button
+                type="button"
+                onClick={() => onDelete(c._id)}
+                className="text-sm font-semibold text-rose-600 hover:underline"
+              >
+                Delete
+              </button>
+            )}
+
+            {canModerate && (
+              c.hidden ? (
+                <button
+                  type="button"
+                  onClick={() => onModerate(c._id, false)}
+                  className="text-sm font-semibold text-emerald-700 hover:underline"
+                >
+                  Unhide
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onModerate(c._id, true)}
+                  className="text-sm font-semibold text-rose-600 hover:underline"
+                >
+                  Moderate
+                </button>
+              )
+            )}
+          </div>
+        </div>
+        {c.hidden ? (
+          <p className="mt-3 text-sm text-slate-500 italic">
+            Comment removed by moderator.
+          </p>
+        ) : (
+          <>
+            <p className="mt-3 text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap">
+              {c.content}
+            </p>
+            <div className="mt-3 flex items-center gap-4">
+              {canComment && (
+                <button
+                  onClick={() => setShowReplyForm(!showReplyForm)}
+                  className="text-xs font-bold text-slate-500 hover:text-cyan-600 transition-colors"
+                >
+                  Reply
+                </button>
+              )}
+              {c.repliesCount > 0 && (
+                <button
+                  onClick={toggleReplies}
+                  className="text-xs font-bold text-cyan-700 hover:text-cyan-600 transition-colors"
+                >
+                  {showReplies ? "Hide replies" : `Show ${c.repliesCount} replies`}
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {showReplyForm && (
+          <form onSubmit={handleReplySubmit} className="mt-3">
+            <textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              rows={2}
+              placeholder="Write a reply..."
+              className="w-full rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-sm outline-none text-gray-900 dark:text-white focus:border-cyan-500 transition-colors"
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowReplyForm(false)}
+                className="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmittingReply || !replyContent.trim()}
+                className="inline-flex items-center justify-center rounded-lg bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-xs font-bold text-white shadow-sm disabled:opacity-70 transition-colors"
+              >
+                {isSubmittingReply ? "Replying..." : "Post reply"}
+              </button>
+            </div>
+          </form>
+        )}
+      </article>
+
+      {showReplies && (
+        <div className="ml-4 border-l-2 border-slate-200 dark:border-gray-800 pl-4 mt-4 space-y-4">
+          {loadingReplies ? (
+            <div className="h-10 animate-pulse rounded-xl bg-slate-100 dark:bg-gray-800/50" />
+          ) : (
+            replies.map((reply) => (
+              <CommentItem
+                key={reply._id}
+                comment={reply}
+                courseId={courseId}
+                user={user}
+                canModerate={canModerate}
+                onDelete={onDelete}
+                onModerate={onModerate}
+                isCourseInstructor={isCourseInstructor}
+                enrolled={enrolled}
+              />
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Comments({ courseId, enrolled, course }) {
   const { user } = useAuth();
   const [comments, setComments] = useState([]);
@@ -192,52 +381,19 @@ export default function Comments({ courseId, enrolled, course }) {
               ))}
             </div>
           ) : comments.length ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {comments.map((c) => (
-                <article key={c._id} className="rounded-2xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 p-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">{c.user?.name || "Learner"}</p>
-                      <p className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleString()}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {(String(c.user?._id || c.user) === String(user?._id) || user?.role === "admin") && (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(c._id)}
-                          className="text-sm font-semibold text-rose-600"
-                        >
-                          Delete
-                        </button>
-                      )}
-
-                      {canModerate && (
-                        c.hidden ? (
-                          <button
-                            type="button"
-                            onClick={() => handleModerate(c._id, false)}
-                            className="text-sm font-semibold text-emerald-700"
-                          >
-                            Unhide
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleModerate(c._id, true)}
-                            className="text-sm font-semibold text-rose-600"
-                          >
-                            Moderate
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-                  {c.hidden ? (
-                    <p className="mt-3 text-sm text-slate-500 italic">Comment removed by moderator.</p>
-                  ) : (
-                    <p className="mt-3 text-sm text-slate-700">{c.content}</p>
-                  )}
-                </article>
+                <CommentItem
+                  key={c._id}
+                  comment={c}
+                  courseId={courseId}
+                  user={user}
+                  canModerate={canModerate}
+                  onDelete={handleDelete}
+                  onModerate={handleModerate}
+                  isCourseInstructor={isCourseInstructor}
+                  enrolled={enrolled}
+                />
               ))}
             </div>
           ) : (

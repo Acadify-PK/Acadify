@@ -8,10 +8,14 @@ import mongoose from "mongoose";
 export const addComment = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { courseId, content } = req.body;
+    const { courseId, content, parentCommentId } = req.body;
 
     if (!content || !content.trim()) {
       return res.status(400).json({ message: "Content is required" });
+    }
+
+    if (parentCommentId && !mongoose.Types.ObjectId.isValid(parentCommentId)) {
+      return res.status(400).json({ message: "Invalid parentCommentId" });
     }
 
     // Abuse detection: Check rapid commenting
@@ -28,29 +32,56 @@ export const addComment = async (req, res) => {
     // Check if user is shadow banned
     const isShadowBanned = req.user.isShadowBanned || false;
 
-    const comment = await Comment.create({
+    const commentData = {
       user: userId,
       course: courseId,
       content: content.trim(),
-      hidden: isShadowBanned, // Auto-hide if shadow banned
+      hidden: isShadowBanned, 
       moderationReason: isShadowBanned ? "Auto-hidden (Shadow Banned User)" : undefined,
       moderatedAt: isShadowBanned ? new Date() : undefined,
-    });
+    };
 
-    const populated = await comment.populate("user", "name");
+    if (parentCommentId) {
+      commentData.parentComment = parentCommentId;
+    }
 
-    // Course instructor notification
-    const courseObj = await Course.findById(courseId).select("instructor title");
-    if (courseObj && String(courseObj.instructor) !== String(userId)) {
-      await createNotification({
-        recipient: courseObj.instructor,
-        sender: userId,
-        type: "new_comment",
-        message: `${req.user.name} recently commented on your course "${courseObj.title}"`,
-        link: `/course/${courseId}`,
-        priority: "medium",
-        metadata: { courseId, commentId: comment._id }
-      });
+    const comment = await Comment.create(commentData);
+
+    // If it's a reply, increment repliesCount on parent
+    if (parentCommentId) {
+      await Comment.findByIdAndUpdate(parentCommentId, { $inc: { repliesCount: 1 } });
+      
+      // Notify parent comment author
+      const parent = await Comment.findById(parentCommentId).populate("user", "name");
+      if (parent && String(parent.user._id) !== String(userId)) {
+        await createNotification({
+          recipient: parent.user._id,
+          sender: userId,
+          type: "new_comment", // reuse or add "new_reply"
+          message: `${req.user.name} replied to your comment`,
+          link: `/course/${courseId}`,
+          priority: "medium",
+          metadata: { courseId, commentId: comment._id, parentCommentId }
+        });
+      }
+    }
+
+    const populated = await comment.populate("user", "name avatar");
+
+    // Course instructor notification (only for top-level comments or if allowed)
+    if (!parentCommentId) {
+      const courseObj = await Course.findById(courseId).select("instructor title");
+      if (courseObj && String(courseObj.instructor) !== String(userId)) {
+        await createNotification({
+          recipient: courseObj.instructor,
+          sender: userId,
+          type: "new_comment",
+          message: `${req.user.name} recently commented on your course "${courseObj.title}"`,
+          link: `/course/${courseId}`,
+          priority: "medium",
+          metadata: { courseId, commentId: comment._id }
+        });
+      }
     }
 
     res.status(201).json(populated);
@@ -62,7 +93,7 @@ export const addComment = async (req, res) => {
 export const getComments = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { page: pageQ, limit: limitQ, q } = req.query;
+    const { page: pageQ, limit: limitQ, q, parentId } = req.query;
     const currentUserId = req.user?._id;
 
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
@@ -74,14 +105,10 @@ export const getComments = async (req, res) => {
     const skip = (page - 1) * limit;
     const courseObjectId = new mongoose.Types.ObjectId(courseId);
 
-    // Visibility logic:
-    // 1. Show all non-hidden comments
-    // 2. If logged in, also show your OWN hidden comments (for shadow-ban effect)
-    // 3. Admin/Instructor see all hidden anyway? Let's keep it simple:
-    //    Everyone sees non-hidden. Owners see their own hidden. 
-    //    Moderators see all (we'll add that match later if needed)
-
-    const baseMatch = { course: courseObjectId };
+    const baseMatch = { 
+      course: courseObjectId,
+      parentComment: parentId ? new mongoose.Types.ObjectId(parentId) : null
+    };
     
     if (currentUserId) {
       baseMatch.$or = [
