@@ -10,6 +10,15 @@ const userSchema = new mongoose.Schema({
         enum: ["student", "instructor", "admin"],
         default: "student",
     },
+    avatar: { type: String, default: "" },
+    bio: { type: String, default: "" },
+    headline: { type: String, default: "" },
+    website: { type: String, default: "" },
+    socialLinks: {
+        twitter: { type: String, default: "" },
+        linkedin: { type: String, default: "" },
+        github: { type: String, default: "" },
+    },
   isShadowBanned: {
     type: Boolean,
     default: false,

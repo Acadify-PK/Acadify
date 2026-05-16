@@ -14,6 +14,7 @@ import InstructorLiveManager from "./pages/InstructorLiveManager";
 import InstructorStudents from "./pages/InstructorStudents";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminModerationLogs from "./pages/AdminModerationLogs";
+import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -40,6 +41,14 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/register" element={<Register />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={

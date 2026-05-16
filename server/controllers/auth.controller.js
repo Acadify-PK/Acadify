@@ -80,9 +80,47 @@ export const me = (req, res) => {
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
+        avatar: req.user.avatar,
+        bio: req.user.bio,
+        headline: req.user.headline,
+        website: req.user.website,
+        socialLinks: req.user.socialLinks,
         isShadowBanned: req.user.isShadowBanned,
         isFlagged: req.user.isFlagged,
     });
+};
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { name, avatar, bio, headline, website, socialLinks } = req.body;
+        const user = await User.findById(req.user._id);
+
+        if (name) user.name = name;
+        if (avatar !== undefined) user.avatar = avatar;
+        if (bio !== undefined) user.bio = bio;
+        if (headline !== undefined) user.headline = headline;
+        if (website !== undefined) user.website = website;
+        if (socialLinks) {
+            user.socialLinks = { ...user.socialLinks, ...socialLinks };
+        }
+
+        await user.save();
+        res.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            bio: user.bio,
+            headline: user.headline,
+            website: user.website,
+            socialLinks: user.socialLinks,
+            isShadowBanned: user.isShadowBanned,
+            isFlagged: user.isFlagged,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const logout = (req, res) => {

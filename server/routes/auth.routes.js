@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, logout, me } from "../controllers/auth.controller.js";
+import { register, login, logout, me, updateProfile } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 import { authLimiter } from "../middleware/rateLimit.middleware.js";
 
@@ -91,5 +91,37 @@ router.post("/logout", logout);
  *         description: Not authenticated
  */
 router.get("/me", protect, me);
+
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   patch:
+ *     summary: Update current user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               avatar:
+ *                 type: string
+ *               bio:
+ *                 type: string
+ *               headline:
+ *                 type: string
+ *               website:
+ *                 type: string
+ *               socialLinks:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Profile updated
+ */
+router.patch("/profile", protect, updateProfile);
 
 export default router;

@@ -11,6 +11,7 @@ import {
   BarChart3,
   Video,
   Users,
+  User,
   Menu,
   X,
   Moon,
@@ -33,6 +34,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Browse", path: "/lms", icon: Search, roles: ["student", "instructor", "admin"] },
     { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student"] },
+    { name: "Profile", path: "/profile", icon: User, roles: ["student", "instructor", "admin"] },
     { name: "Students", path: "/instructor/students", icon: Users, roles: ["instructor", "admin"] },
     { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor", "admin"] },
     { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor", "admin"] },
@@ -94,12 +96,23 @@ export default function Navbar() {
                 <NotificationsDropdown />
                 <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
                 <div className="flex items-center gap-3 pl-2">
-                  <div className="text-right">
-                    <p className="text-xs font-black text-gray-900 dark:text-white leading-none">{user.name}</p>
+                  <Link to="/profile" className="text-right group">
+                    <p className="text-xs font-black text-gray-900 dark:text-white leading-none group-hover:text-blue-600 transition-colors">{user.name}</p>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
                       {user.role}
                     </p>
-                  </div>
+                  </Link>
+                  <Link to="/profile" className="relative group">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-gray-100 dark:border-gray-800 group-hover:border-blue-500/50 transition-all">
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                          <User className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
