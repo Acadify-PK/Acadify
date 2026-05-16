@@ -95,13 +95,32 @@ export const updateProfile = async (req, res) => {
         const { name, avatar, bio, headline, website, socialLinks } = req.body;
         const user = await User.findById(req.user._id);
 
-        if (name) user.name = name;
-        if (avatar !== undefined) user.avatar = avatar;
-        if (bio !== undefined) user.bio = bio;
-        if (headline !== undefined) user.headline = headline;
-        if (website !== undefined) user.website = website;
+        if (name) user.name = name.trim();
+        
+        // Basic sanitization for Avatar URL
+        if (avatar !== undefined) {
+            if (avatar === "") {
+                user.avatar = "";
+            } else if (avatar.startsWith('https://') || avatar.startsWith('http://') || avatar.startsWith('data:image/')) {
+                user.avatar = avatar;
+            }
+        }
+
+        if (bio !== undefined) user.bio = bio.substring(0, 500);
+        if (headline !== undefined) user.headline = headline.substring(0, 100);
+        
+        if (website !== undefined) {
+            if (website === "" || website.startsWith('http')) {
+                user.website = website;
+            }
+        }
+
         if (socialLinks) {
-            user.socialLinks = { ...user.socialLinks, ...socialLinks };
+            const sanitizedLinks = {};
+            if (socialLinks.twitter) sanitizedLinks.twitter = socialLinks.twitter.startsWith('http') ? socialLinks.twitter : '';
+            if (socialLinks.linkedin) sanitizedLinks.linkedin = socialLinks.linkedin.startsWith('http') ? socialLinks.linkedin : '';
+            if (socialLinks.github) sanitizedLinks.github = socialLinks.github.startsWith('http') ? socialLinks.github : '';
+            user.socialLinks = { ...user.socialLinks, ...sanitizedLinks };
         }
 
         await user.save();
