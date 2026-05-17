@@ -9,6 +9,11 @@ const courseSchema = new mongoose.Schema({
         ref: 'User',
     },
 
+    institute: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Institute',
+    },
+
     price: {
         type: Number,
         default: 0,

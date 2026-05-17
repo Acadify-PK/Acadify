@@ -14,8 +14,10 @@ import InstructorLiveManager from "./pages/InstructorLiveManager";
 import InstructorStudents from "./pages/InstructorStudents";
 import ForgotPassword from "./pages/ForgotPassword";
 import AdminModerationLogs from "./pages/AdminModerationLogs";
+import AdminInstituteModeration from "./pages/AdminInstituteModeration";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
+import RegisterInstitute from "./pages/RegisterInstitute";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -52,6 +54,30 @@ function App() {
       />
       <Route path="/profile/:id" element={<PublicProfile />} />
       <Route
+        path="/institutes/register"
+        element={<RegisterInstitute />}
+      />
+
+      {/* Tenanted Routes */}
+      <Route path="/i/:slug" element={<Home />} />
+      <Route
+        path="/i/:slug/courses/:id"
+        element={
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/i/:slug/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["student"]}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute allowedRoles={["student"]}>
@@ -72,6 +98,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
             <AdminModerationLogs />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/institutes"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminInstituteModeration />
           </ProtectedRoute>
         }
       />

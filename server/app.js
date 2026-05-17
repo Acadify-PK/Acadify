@@ -20,6 +20,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import integrationRoutes from "./routes/integration.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
 import liveSessionRoutes from "./routes/liveSession.routes.js";
+import instituteRoutes from "./routes/institute.routes.js";
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/institutes", instituteRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/moderation", moderationRoutes);

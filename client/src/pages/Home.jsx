@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { useInstitute } from "../context/InstituteContext";
 import { Filter, ChevronDown, ChevronUp, Search as SearchIcon, X } from "lucide-react";
 
 function Home() {
   const { user } = useAuth();
+  const { institute, isTenant } = useInstitute();
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -31,6 +33,7 @@ function Home() {
           page,
           limit: 8,
           search,
+          institute: isTenant ? institute.slug : undefined,
           ...filters,
         },
       })
@@ -81,17 +84,18 @@ function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-8 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:py-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-4">
-              <img src="/logo.png" alt="Acadify" className="w-8 h-8 object-contain" />
+              <img src={isTenant && institute.config?.logo ? institute.config.logo : "/logo.png"} alt={isTenant ? institute.name : "Acadify"} className="w-8 h-8 object-contain" />
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-500">
-                Acadify
+                {isTenant ? institute.name : "Acadify"}
               </p>
             </div>
             <h1 className="text-4xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-5xl">
-              Learn from structured courses built for steady progress.
+              {isTenant ? `Welcome to ${institute.name}` : "Learn from structured courses built for steady progress."}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-gray-400">
-              Browse available courses, open a course workspace, enroll, and
-              continue through lectures from one focused learning view.
+              {isTenant 
+                ? (institute.config?.description || `Explore the expert-led courses offered directly by ${institute.name}.`)
+                : "Browse available courses, open a course workspace, enroll, and continue through lectures from one focused learning view."}
             </p>
           </div>
 

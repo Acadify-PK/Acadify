@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Section from "../models/Section.js";
 import Lecture from "../models/Lecture.js";
 import Course from "../models/Course.js";
@@ -24,13 +25,21 @@ export const getAllCourses = async (req, res) => {
         const maxPrice = parseInt(req.query.maxPrice) || 100000;
         const minRating = parseFloat(req.query.minRating) || 0;
         const sort = req.query.sort || "newest";
+        const instituteSlug = req.query.institute; // Detect institute from query
 
         const skip = (page - 1) * limit;
+
+        let instituteId = null;
+        if (instituteSlug) {
+            const inst = await mongoose.model('Institute').findOne({ slug: instituteSlug });
+            if (inst) instituteId = inst._id;
+        }
 
         const match = {
             published: true,
             price: { $gte: minPrice, $lte: maxPrice },
             ...(search ? { $text: { $search: search } } : {}),
+            ...(instituteId ? { institute: instituteId } : {}), // Filter by institute
         };
 
         let sortOption = { createdAt: -1 };

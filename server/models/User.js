@@ -7,9 +7,10 @@ const userSchema = new mongoose.Schema({
     password: String,
     role: {
         type: String,
-        enum: ["student", "instructor", "admin"],
+        enum: ["student", "instructor", "admin", "institute_admin"],
         default: "student",
     },
+    institute: { type: mongoose.Schema.Types.ObjectId, ref: 'Institute' },
     avatar: { type: String, default: "" },
     banner: { type: String, default: "" },
     bio: { type: String, default: "" },

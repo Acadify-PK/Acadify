@@ -12,7 +12,10 @@ import {
   Clock,
   ChevronRight,
   Star,
-  Quote
+  Quote,
+  Building2,
+  Globe,
+  ShieldCheck
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -53,24 +56,24 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
-              NEW: Advanced LMS Features Now Available
+              NEW: Custom Institutes & Multi-Tenancy
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-gray-950 dark:text-white leading-[1.1] mb-8 tracking-tight">
-              Master Any Skill with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Acadify</span>
+              Your Campus, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Your Rules.</span>
             </h1>
             
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-2xl">
-              The modern learning management system designed for speed, efficiency, and real-world results. Join thousands of students today.
+              Launch your own branded academy in seconds. Acadify provides dedicated spaces for institutes to host, manage, and scale their education business.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link 
-                to="/register" 
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
+                to="/institutes/register" 
+                className="px-8 py-4 bg-gray-950 dark:bg-white text-white dark:text-gray-950 rounded-2xl font-bold shadow-xl shadow-black/10 dark:shadow-white/5 transition-all flex items-center justify-center gap-2 group"
               >
-                Get Started for Free
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Register Your Institute
+                <Building2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
               </Link>
               <Link 
                 to="/lms" 
@@ -94,26 +97,26 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="py-24 container mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-black text-gray-950 dark:text-white mb-4">Everything You Need to Succeed</h2>
-          <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">Acadify provides the tools for both instructors and students to thrive in a digital learning environment.</p>
+          <h2 className="text-3xl md:text-5xl font-black text-gray-950 dark:text-white mb-4">A Platform for Every Scale</h2>
+          <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">From individual creators to multi-national institutes, Acadify provides the infrastructure to serve millions of students.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              icon: Layout,
-              title: "Expert Dashboard",
-              desc: "Manage your courses, track student progress, and analyze revenue with our powerful analytics suite."
+              icon: Building2,
+              title: "Branded Institutes",
+              desc: "Get a dedicated workspace with your own branding, slug, and management dashboard. Perfect for growing academies."
             },
             {
-              icon: Rocket,
-              title: "Rapid Learning",
-              desc: "Optimized video delivery and clean UI ensures you stay focused on what matters: the content."
+              icon: Globe,
+              title: "Multi-Tenant Architecture",
+              desc: "Complete data isolation. Your students, your courses, and your revenue—all in one secure container."
             },
             {
-              icon: Users,
-              title: "Community Growth",
-              desc: "Engage with students via comments, reviews, and interactive course sections."
+              icon: ShieldCheck,
+              title: "Enterprise Moderation",
+              desc: "Advanced moderation tools for admins to review and approve institute applications within seconds."
             }
           ].map((feature, i) => (
             <div key={i} className="p-8 rounded-3xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 transition-all hover:shadow-2xl hover:shadow-blue-500/5 group">

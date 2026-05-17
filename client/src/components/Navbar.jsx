@@ -15,13 +15,16 @@ import {
   Menu,
   X,
   Moon,
-  Sun
+  Sun,
+  Building2
 } from "lucide-react";
 import { useState } from "react";
+import { useInstitute } from "../context/InstituteContext";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
+  const { institute, isTenant } = useInstitute();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,11 +37,14 @@ export default function Navbar() {
   const navLinks = [
     { name: "Browse", path: "/lms", icon: Search, roles: ["student", "instructor", "admin"] },
     { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student"] },
-    { name: "Profile", path: "/profile", icon: User, roles: ["student", "instructor", "admin"] },
-    { name: "Students", path: "/instructor/students", icon: Users, roles: ["instructor", "admin"] },
-    { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor", "admin"] },
-    { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor", "admin"] },
-    { name: "Moderation", path: "/admin/moderation", icon: ShieldCheck, roles: ["admin"] },
+    { name: "Students", path: "/instructor/students", icon: Users, roles: ["instructor"] },
+    { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor"] },
+    { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor"] },
+  ];
+
+  const adminLinks = [
+    { name: "Institutes", path: "/admin/institutes", icon: Building2 },
+    { name: "Moderation", path: "/admin/moderation", icon: ShieldCheck },
   ];
 
   const activeLink = (path) => location.pathname === path;
@@ -49,14 +55,14 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           {/* Logo Section */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2 group">
+            <Link to={isTenant ? `/i/${institute.slug}` : "/"} className="flex items-center gap-2 group">
               <img 
-                src="/logo.png" 
-                alt="Acadify Logo" 
+                src={isTenant && institute.config?.logo ? institute.config.logo : "/logo.png"} 
+                alt="Logo" 
                 className="w-10 h-10 object-contain transition-transform group-hover:rotate-6 shadow-lg shadow-blue-500/10 rounded-xl"
               />
               <span className="text-2xl font-black text-gray-900 dark:text-white tracking-tighter transition-colors group-hover:text-blue-600">
-                Acadify
+                {isTenant ? institute.name : "Acadify"}
               </span>
             </Link>
           </div>
@@ -68,21 +74,41 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                     activeLink(link.path)
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                       : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <link.icon className={`w-4 h-4 ${activeLink(link.path) ? "animate-pulse" : ""}`} />
+                  <link.icon className={`w-3.5 h-3.5 ${activeLink(link.path) ? "animate-pulse" : ""}`} />
                   {link.name}
                 </Link>
               )
             ))}
+
+            {user?.role === "admin" && (
+              <>
+                <div className="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-2" />
+                {adminLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
+                      activeLink(link.path)
+                        ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border border-cyan-100 dark:border-cyan-900/30"
+                        : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <link.icon className="w-3.5 h-3.5" />
+                    {link.name}
+                  </Link>
+                ))}
+              </>
+            )}
           </div>
 
           {/* User Actions Section */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
@@ -95,20 +121,20 @@ export default function Navbar() {
               <>
                 <NotificationsDropdown />
                 <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
-                <div className="flex items-center gap-3 pl-2">
-                  <Link to="/profile" className="text-right group">
-                    <p className="text-xs font-black text-gray-900 dark:text-white leading-none group-hover:text-blue-600 transition-colors">{user.name}</p>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                <div className="flex items-center gap-2 pl-1">
+                  <Link to="/profile" className="text-right group hidden xl:block">
+                    <p className="text-[10px] font-black text-gray-900 dark:text-white leading-none group-hover:text-blue-600 transition-colors truncate max-w-[80px]">{user.name}</p>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
                       {user.role}
                     </p>
                   </Link>
                   <Link to="/profile" className="relative group">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-gray-100 dark:border-gray-800 group-hover:border-blue-500/50 transition-all">
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden border border-gray-100 dark:border-gray-800 group-hover:border-blue-500/50 transition-all">
                       {user.avatar ? (
                         <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-400">
-                          <User className="w-5 h-5" />
+                          <User className="w-4 h-4" />
                         </div>
                       )}
                     </div>
@@ -118,7 +144,7 @@ export default function Navbar() {
                     className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
                     title="Logout"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-4 h-4" />
                   </button>
                 </div>
               </>
