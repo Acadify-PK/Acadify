@@ -24,6 +24,9 @@ import instituteRoutes from "./routes/institute.routes.js";
 
 const app = express();
 
+// Required for express-rate-limit to work correctly behind Vercel/proxies
+app.set("trust proxy", 1);
+
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL,
