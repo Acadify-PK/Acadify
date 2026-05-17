@@ -45,6 +45,16 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Healthcheck endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "UP",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development"
+  });
+});
+
 // Apply global rate limiting to all requests
 app.use(globalLimiter);
 
