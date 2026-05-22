@@ -76,15 +76,89 @@ export const verifyInstitute = async (req, res) => {
         institute.isVerified = true;
         await institute.save();
 
+        // 1. Find the user by ownerEmail
+        let user = await User.findOne({ email: institute.ownerEmail });
+        let isNewUser = false;
+        let tempPasswordString = null;
+
+        if (user) {
+            // 2. If user exists, upgrade their role
+            user.role = 'institute_admin';
+            user.institute = institute._id;
+            await user.save();
+        } else {
+            // 3. If user doesn't exist (Guest Signup), create a placeholder user
+            isNewUser = true;
+            tempPasswordString = Math.random().toString(36).slice(-8) + "!1A";
+            
+            user = new User({
+                name: institute.ownerName,
+                email: institute.ownerEmail,
+                password: tempPasswordString, 
+                role: 'institute_admin',
+                institute: institute._id
+            });
+            await user.save();
+            console.log("Created guest user. tempPasswordString is:", tempPasswordString);
+        }
+
+        console.log("Calling sendInstituteApprovalEmail with:", {
+            email: institute.ownerEmail,
+            isNewUser,
+            hasTempPass: !!tempPasswordString,
+            tempPassPreview: tempPasswordString ? tempPasswordString.substring(0, 3) + "..." : "NONE"
+        });
+
         // Send Approval Email via Resend
         await sendInstituteApprovalEmail(
             institute.ownerEmail,
             institute.ownerName,
             institute.name,
-            institute.slug
+            institute.slug,
+            isNewUser,
+            tempPasswordString
         );
 
         res.json({ message: `${institute.name} has been activated!`, institute });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * ADMIN ONLY: Resend approval email
+ */
+export const resendApprovalEmail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const institute = await Institute.findById(id);
+
+        if (!institute) return res.status(404).json({ message: "Institute not found" });
+        if (!institute.isVerified) return res.status(400).json({ message: "Institute is not yet verified" });
+
+        // For existing users, we don't send a temp password
+        // We just remind them they can login with their existing account
+        await sendInstituteApprovalEmail(
+            institute.ownerEmail,
+            institute.ownerName,
+            institute.name,
+            institute.slug,
+            false // isNewUser = false
+        );
+
+        res.json({ message: `Approval email resent to ${institute.ownerEmail}` });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * ADMIN ONLY: Get all institutes
+ */
+export const getAllInstitutes = async (req, res) => {
+    try {
+        const institutes = await Institute.find().sort({ createdAt: -1 });
+        res.json(institutes);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

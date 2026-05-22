@@ -9,11 +9,34 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  * @param {string} ownerName - The name of the institute owner.
  * @param {string} instituteName - The name of the approved institute.
  * @param {string} slug - The slug/subdomain of the institute.
+ * @param {boolean} isNewUser - Whether a new user account was created.
+ * @param {string} tempPassword - The temporary password for new users.
  */
-export const sendInstituteApprovalEmail = async (toEmail, ownerName, instituteName, slug) => {
+export const sendInstituteApprovalEmail = async (toEmail, ownerName, instituteName, slug, isNewUser = false, tempPassword = null) => {
     try {
+        console.log("sendInstituteApprovalEmail triggered", { toEmail, isNewUser, tempPassword });
         const loginUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`;
         const instituteUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/i/${slug}`;
+
+        let accountSection = '';
+        if (isNewUser) {
+            accountSection = `
+                <div style="margin: 20px 0; padding: 15px; border-left: 4px solid #f59e0b; background-color: #fffbeb;">
+                    <p style="margin: 0; font-weight: bold; color: #92400e;">Temporary Login Credentials:</p>
+                    <p style="margin: 5px 0; color: #b45309;">Email: <strong>${toEmail}</strong></p>
+                    ${tempPassword ? `<p style="margin: 5px 0; color: #b45309;">Temporary Password: <strong>${tempPassword}</strong></p>` : ''}
+                    <p style="margin: 10px 0 0 0; font-size: 13px; font-style: italic; color: #b45309;">
+                        ⚠️ Please change your password as soon as possible after your first login for security reasons.
+                    </p>
+                </div>
+            `;
+        } else {
+            accountSection = `
+                <p style="font-size: 15px; color: #64748b;">
+                    You can now log in with your existing account to manage your campus.
+                </p>
+            `;
+        }
 
         const { data, error } = await resend.emails.send({
             from: 'Acadify <onboarding@resend.dev>', // Replace with your verified domain in production
@@ -25,6 +48,9 @@ export const sendInstituteApprovalEmail = async (toEmail, ownerName, instituteNa
                     <p style="font-size: 16px; color: #475569;">
                         Your application for <strong>${instituteName}</strong> has been approved. Your dedicated campus is now live and ready for students.
                     </p>
+                    
+                    ${accountSection}
+
                     <div style="margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px; text-align: center;">
                         <p style="margin-bottom: 20px; font-weight: bold; color: #1e293b;">Your campus URL:</p>
                         <a href="${instituteUrl}" style="font-size: 18px; color: #3b82f6; text-decoration: none; font-weight: bold;">${instituteUrl}</a>
