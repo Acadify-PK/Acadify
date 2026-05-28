@@ -35,11 +35,11 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: "Browse", path: "/lms", icon: Search, roles: ["student", "instructor", "admin"] },
+    { name: "Browse", path: "/lms", icon: Search, roles: ["student", "instructor", "institute_admin", "admin"] },
     { name: "My Learning", path: "/dashboard", icon: LayoutDashboard, roles: ["student"] },
-    { name: "Students", path: "/instructor/students", icon: Users, roles: ["instructor"] },
-    { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor"] },
-    { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor"] },
+    { name: "Students", path: "/instructor/students", icon: Users, roles: ["instructor", "institute_admin"] },
+    { name: "Teach", path: "/instructor", icon: BarChart3, roles: ["instructor", "institute_admin"] },
+    { name: "Live", path: "/instructor/live", icon: Video, roles: ["instructor", "institute_admin"] },
   ];
 
   const adminLinks = [

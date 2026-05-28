@@ -5,15 +5,25 @@ import {
     getPendingInstitutes, 
     verifyInstitute,
     resendApprovalEmail,
-    getAllInstitutes
+    getAllInstitutes,
+    getMyInstitute,
+    updateInstituteBranding,
+    inviteInstructor,
+    finalizeOnboarding
 } from "../controllers/institute.controller.js";
 import { protect, optionalAuth } from "../middleware/auth.middleware.js";
-import { isAdmin } from "../middleware/role.middleware.js";
+import { isAdmin, isInstituteAdmin } from "../middleware/role.middleware.js";
 
 const router = express.Router();
 
 // Public / Guest
 router.post("/register", optionalAuth, registerInstitute);
+
+// Institute Admin Onboarding / Settings
+router.get("/my-institute", protect, isInstituteAdmin, getMyInstitute);
+router.put("/branding", protect, isInstituteAdmin, updateInstituteBranding);
+router.post("/invite-instructor", protect, isInstituteAdmin, inviteInstructor);
+router.post("/finalize-onboarding", protect, finalizeOnboarding);
 
 // Admin Only
 router.get("/all", protect, isAdmin, getAllInstitutes);

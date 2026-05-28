@@ -34,6 +34,12 @@ function Login() {
       // Role-based redirection
       if (user.role === "admin") {
         navigate("/admin/moderation");
+      } else if (user.role === "institute_admin") {
+        if (!user.onboardingCompleted) {
+          navigate("/onboarding");
+        } else {
+          navigate("/instructor");
+        }
       } else if (user.role === "instructor") {
         navigate("/instructor");
       } else {

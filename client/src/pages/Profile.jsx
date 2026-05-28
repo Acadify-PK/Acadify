@@ -2,12 +2,13 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-import { User, Mail, Globe, Camera, Check, Shield, ShieldOff, Copy, ExternalLink, Phone, Image as ImageIcon } from "lucide-react";
+import { User, Mail, Globe, Camera, Check, Shield, ShieldOff, Copy, ExternalLink, Phone, Image as ImageIcon, Key } from "lucide-react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 
 export default function Profile() {
   const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [passLoading, setPassLoading] = useState(false);
   const profileUrl = `${window.location.origin}/profile/${user?._id}`;
 
   const [form, setForm] = useState({
@@ -24,6 +25,12 @@ export default function Profile() {
       linkedin: user?.socialLinks?.linkedin || "",
       github: user?.socialLinks?.github || "",
     },
+  });
+
+  const [passForm, setPassForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const copyToClipboard = () => {
@@ -47,6 +54,10 @@ export default function Profile() {
     }
   };
 
+  const handlePassChange = (e) => {
+    setPassForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -58,6 +69,26 @@ export default function Profile() {
       toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (passForm.newPassword !== passForm.confirmPassword) {
+      return toast.error("New passwords do not match");
+    }
+    setPassLoading(true);
+    try {
+      await axios.post("/auth/change-password", {
+        currentPassword: passForm.currentPassword,
+        newPassword: passForm.newPassword,
+      });
+      toast.success("Password changed successfully!");
+      setPassForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to change password");
+    } finally {
+      setPassLoading(false);
     }
   };
 
@@ -302,6 +333,58 @@ export default function Profile() {
                     />
                   </div>
                 </div>
+              </div>
+            </section>
+
+            {/* Change Password */}
+            <section className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-8 shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <Key className="text-cyan-600" size={24} />
+                <h2 className="text-xl font-bold dark:text-white">Security</h2>
+              </div>
+              
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Current Password</label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={passForm.currentPassword}
+                    onChange={handlePassChange}
+                    className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">New Password</label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passForm.newPassword}
+                    onChange={handlePassChange}
+                    className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-gray-400">Confirm New Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passForm.confirmPassword}
+                    onChange={handlePassChange}
+                    className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-5 py-3 text-sm outline-none transition focus:border-cyan-500 dark:text-white"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handlePasswordSubmit}
+                  disabled={passLoading || !passForm.currentPassword || !passForm.newPassword}
+                  className="rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-6 py-2.5 text-xs font-bold hover:opacity-90 transition disabled:opacity-50"
+                >
+                  {passLoading ? "Updating..." : "Update Password"}
+                </button>
               </div>
             </section>
           </div>

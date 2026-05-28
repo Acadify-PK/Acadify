@@ -12,3 +12,10 @@ export const isAdmin = (req, res, next) => {
     next();
 };
 
+export const isInstituteAdmin = (req, res, next) => {
+    if (!req.user || (req.user.role !== "institute_admin" && req.user.role !== "admin")) {
+        return res.status(403).json({ message: "Institute Admin access required" });
+    }
+    next();
+};
+

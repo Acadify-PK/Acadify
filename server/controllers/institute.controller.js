@@ -164,3 +164,100 @@ export const getAllInstitutes = async (req, res) => {
     }
 };
 
+/**
+ * INSTITUTE_ADMIN ONLY: Get current user's institute
+ */
+export const getMyInstitute = async (req, res) => {
+    try {
+        if (!req.user.institute) {
+            return res.status(404).json({ message: "No institute linked to this user" });
+        }
+        const institute = await Institute.findById(req.user.institute);
+        res.json(institute);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * INSTITUTE_ADMIN ONLY: Update institute branding/config
+ */
+export const updateInstituteBranding = async (req, res) => {
+    try {
+        const { name, description, logo, banner } = req.body;
+        const institute = await Institute.findById(req.user.institute);
+
+        if (!institute) return res.status(404).json({ message: "Institute not found" });
+
+        if (name) institute.name = name;
+        if (description) institute.config.description = description;
+        if (logo) institute.config.logo = logo;
+        if (banner) institute.config.banner = banner;
+
+        await institute.save();
+        res.json({ message: "Branding updated successfully", institute });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * INSTITUTE_ADMIN ONLY: Create/Invite instructors
+ */
+export const inviteInstructor = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const adminUser = req.user;
+
+        if (!adminUser.institute) {
+            return res.status(403).json({ message: "You must be linked to an institute to invite team members" });
+        }
+
+        // Check if user already exists
+        const existing = await User.findOne({ email });
+        if (existing) return res.status(400).json({ message: "User with this email already exists" });
+
+        // Create new instructor
+        const tempPassword = Math.random().toString(36).slice(-8) + "!1A";
+        const instructor = new User({
+            name,
+            email,
+            password: tempPassword,
+            role: 'instructor',
+            institute: adminUser.institute,
+            onboardingCompleted: true // Instructors don't go through the admin onboarding
+        });
+
+        await instructor.save();
+
+        // Send Welcome Email (Reuse the approval email service or create a specialized one)
+        // For now, reuse sendInstituteApprovalEmail with a flag or similar
+        await sendInstituteApprovalEmail(
+            email,
+            name,
+            "Your Teaching Dashboard", // placeholder
+            "campus", // placeholder
+            true, // isNewUser
+            tempPassword
+        );
+
+        res.status(201).json({ message: `Instructor ${name} invited successfully`, instructor });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * INSTITUTE_ADMIN ONLY: Complete onboarding
+ */
+export const finalizeOnboarding = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        user.onboardingCompleted = true;
+        await user.save();
+        res.json({ message: "Onboarding finalized", user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

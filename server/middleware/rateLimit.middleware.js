@@ -21,7 +21,16 @@ export const authLimiter = rateLimit({
     message: "Too many authentication attempts, please try again after an hour",
   },
 });
-
+// Limiter for password changes to prevent brute force
+export const passwordChangeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // Limit to 5 attempts per hour
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "Too many password change attempts, please try again after an hour",
+  },
+});
 // Moderate limiter for interaction endpoints (Comments/Reviews)
 export const interactionLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes

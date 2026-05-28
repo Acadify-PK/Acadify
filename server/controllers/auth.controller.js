@@ -159,6 +159,24 @@ export const updateProfile = async (req, res) => {
     }
 };
 
+export const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user._id);
+
+        if (!(await user.comparePassword(currentPassword))) {
+            return res.status(401).json({ message: "Invalid current password" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: "Password updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select("-password -email -integrations");

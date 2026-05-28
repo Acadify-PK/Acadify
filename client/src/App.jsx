@@ -18,11 +18,12 @@ import AdminInstituteModeration from "./pages/AdminInstituteModeration";
 import Profile from "./pages/Profile";
 import PublicProfile from "./pages/PublicProfile";
 import RegisterInstitute from "./pages/RegisterInstitute";
+import OnboardingWizard from "./pages/OnboardingWizard";
 import Navbar from "./components/Navbar";
 
 function App() {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/register", "/forgot-password"];
+  const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/onboarding"];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -31,6 +32,7 @@ function App() {
       {!shouldHideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
         <Route path="/lms" element={<Home />} />
       <Route
         path="/courses/:id"
@@ -88,7 +90,7 @@ function App() {
       <Route
         path="/instructor"
         element={
-          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+          <ProtectedRoute allowedRoles={["instructor", "institute_admin", "admin"]}>
             <InstructorDashboard />
           </ProtectedRoute>
         }
@@ -112,7 +114,7 @@ function App() {
       <Route
         path="/instructor/analytics"
         element={
-          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+          <ProtectedRoute allowedRoles={["instructor", "institute_admin", "admin"]}>
             <InstructorAnalytics />
           </ProtectedRoute>
         }
@@ -120,7 +122,7 @@ function App() {
       <Route
         path="/instructor/students"
         element={
-          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+          <ProtectedRoute allowedRoles={["instructor", "institute_admin", "admin"]}>
             <InstructorStudents />
           </ProtectedRoute>
         }
@@ -128,7 +130,7 @@ function App() {
       <Route
         path="/instructor/live"
         element={
-          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+          <ProtectedRoute allowedRoles={["instructor", "institute_admin", "admin"]}>
             <InstructorLiveManager />
           </ProtectedRoute>
         }
@@ -136,7 +138,7 @@ function App() {
       <Route
         path="/instructor/course/:id"
         element={
-          <ProtectedRoute allowedRoles={["instructor", "admin"]}>
+          <ProtectedRoute allowedRoles={["instructor", "institute_admin", "admin"]}>
             <CourseBuilder />
           </ProtectedRoute>
         }

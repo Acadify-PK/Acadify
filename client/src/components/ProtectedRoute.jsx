@@ -16,6 +16,15 @@ function ProtectedRoute({ children, allowedRoles }) {
 
   if (!user) return <Navigate to="/login" />;
 
+  // Enforce onboarding for institute admins who haven't completed it
+  if (
+    user.role === "institute_admin" && 
+    !user.onboardingCompleted && 
+    window.location.pathname !== "/onboarding"
+  ) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
